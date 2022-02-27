@@ -245,11 +245,11 @@ function NewPoll() {
 			<Button onClick={handleNewAnswer} size="large" variant="contained">
 				+ Antwortmöglichkeit hinzufügen
 			</Button>
+			<Divider sx={{ marginTop: '20px', marginBottom: '20px' }} />
 			<FormGroup sx={{ marginTop: '10px' }}>
 				<FormControlLabel control={<Checkbox onChange={checkFreeText} defaultChecked={false} />} label="Freitextantworten zulassen" />
 				<FormControlLabel control={<Checkbox onChange={checkMultipleVotes} defaultChecked={true} />} label="Mehrfachstimmen zulassen" />
 			</FormGroup>
-			<Divider sx={{ marginTop: '20px', marginBottom: '20px' }} />
 			<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
 				<Typography sx={{ marginTop: '15px', fontWeight: 'bold' }}>Anzahl der Stimmen pro Teilnehmer:</Typography>
 				<TextField
@@ -278,16 +278,15 @@ function NewPoll() {
 					variant="outlined"
 				/>
 			</Box>
-			<Divider sx={{ marginTop: '20px', marginBottom: '20px' }} />
-			<Typography sx={{ marginTop: '15px', fontWeight: 'bold' }}>Sonstiges:</Typography>
+			{/*<Typography sx={{ marginTop: '15px', fontWeight: 'bold' }}>Sonstiges:</Typography>
 			<FormGroup sx={{ marginTop: '10px' }}>
 				<FormControlLabel control={<Checkbox defaultChecked={true} />} label="Teilnehmer dürfen Ergebnisse während der Abstimmung anzeigen" />
 				<FormControlLabel control={<Checkbox defaultChecked={true} />} label="Anzahl der Stimmen für Teilnehmer während der Abstimmung einblenden" />
 				<FormControlLabel control={<Checkbox defaultChecked={true} />} label="Teilnehmer dürfen Ergebnisse nach der Abstimmung anzeigen" />
 				<FormControlLabel control={<Checkbox defaultChecked={true} />} label="Anzahl der Stimmen für Teilnehmer nach der Abstimmung einblenden" />
 				<FormControlLabel control={<Checkbox defaultChecked={true} />} label="Teilnehmer dürfen während der Abstimmung Restzeit anzeigen" />
-			</FormGroup>
-			<Stack sx={{ marginTop: '15px', display: 'flex', justifyContent: 'right' }} direction="row" spacing={2}>
+			</FormGroup>*/}
+			<Stack sx={{ marginTop: '15px', marginBottom: '10px', display: 'flex', justifyContent: 'right' }} direction="row" spacing={2}>
 				<Button onClick={save} variant="contained">Abstimmung speichern</Button>
 				<Button onClick={start} variant="contained">Abstimmung starten</Button>
 			</Stack>

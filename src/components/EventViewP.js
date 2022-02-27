@@ -12,7 +12,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { io } from "socket.io-client";
 
 function EventViewP(props) {
 	const [open, setOpen] = React.useState(false);
@@ -63,7 +63,8 @@ function EventViewP(props) {
 	}
 
 	const socketListeners = () => {
-		const socket = props.socket;
+		console.log("Listening")
+		const socket = io();
 		socket.on("event-delete", (code) => {
 			console.log("EVENT DELETED");
 			setRedirect('/');
@@ -80,8 +81,8 @@ function EventViewP(props) {
 	React.useEffect(() => {
 		window.addEventListener('resize', handleResize);
 
-		socketListeners();
 		getEventMeta();
+		socketListeners();
 
 		return () => {
 			window.removeEventListener('resize', handleResize);

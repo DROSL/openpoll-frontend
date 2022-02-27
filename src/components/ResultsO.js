@@ -1,11 +1,11 @@
 import * as React from "react";
-import { useEffect } from "react";
 
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import { Typography } from "@mui/material";
 import { Navigate, useParams } from "react-router-dom";
+import { io } from "socket.io-client";
 
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 
@@ -76,7 +76,7 @@ function ResultsP(props) {
 	}
 
 	const socketListeners = () => {
-		const socket = props.socket;
+		const socket = io();
 		socket.on("event-delete", (code) => {
 			console.log("EVENT DELETED");
 			setRedirect('/');

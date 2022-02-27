@@ -10,6 +10,8 @@ import CreateEvent from "./components/CreateEvent";
 import NewPoll from "./components/NewPoll";
 import EditEvent from "./components/EditEvent";
 import ResultsO from "./components/ResultsO";
+import JoinO from "./components/JoinO";
+import JoinP from "./components/JoinP";
 import { io } from "socket.io-client";
 
 function App() {
@@ -27,9 +29,11 @@ function App() {
 					<Route exact path="/p/event/:eventId/poll/:pollId" element={<VoteP socket={socket} />} />
 					<Route exact path="/p/event/:eventId/poll/:pollId/results" element={<ResultsP socket={socket} />} />
 					<Route exact path="/o/event/:eventId" element={<CreateEvent socket={socket} />} />
-					<Route exact path="/o/event/:eventId/newPoll/:pollId" element={<NewPoll />} />
+					<Route exact path="/o/event/:eventId/newPoll/:pollId" element={<NewPoll socket={socket} />} />
 					<Route exact path="/o/event/:eventId/edit" element={<EditEvent socket={socket} />} />
 					<Route exact path="/o/event/:eventId/poll/:pollId/results" element={<ResultsO socket={socket} />} />
+					<Route exact path="/o/event/join/:secretO" element={<JoinO socket={socket} />} />
+					<Route exact path="/p/event/join/:eventId" element={<JoinP socket={socket} />} />
 					<Route path="/" element={<Home />} />
 				</Routes>
 			</Router>

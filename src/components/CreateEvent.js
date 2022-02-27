@@ -37,6 +37,7 @@ function CreateEvent() {
 	const [snackbarText, setSnackbarText] = React.useState("");
 	const [isMobile, setIsMobile] = React.useState(false);
 	const [pollTitle, setPollTitle] = React.useState(null);
+	const [secret, setSecret] = React.useState(null);
 
 	const handleFocus = (event) => event.target.select();
 
@@ -188,8 +189,10 @@ function CreateEvent() {
 		}
 		fetch(process.env.REACT_APP_API_URL + `/events/${params.eventId}`, requestOptions)
 			.then(response => response.json())
-			.then(data =>
-				setEventTitle(data.title)
+			.then(data => {
+				setEventTitle(data.title);
+				setSecret(data.secret);
+			}
 			)
 			.catch(error =>
 				console.log(error)
@@ -280,12 +283,12 @@ function CreateEvent() {
 					+ Neue Abstimmung
 				</ButtonShort>
 				<Typography sx={{ fontWeight: 'bold' }}>Veranstaltung teilen</Typography>
-				<CopyToClipboard text={`http://localhost:3000/p/event/${params.eventId}`} onCopy={() => { setOpenSnackbar(true); setSnackbarText("Öffentlichen Link in die Zwischenablage kopiert.") }}>
+				<CopyToClipboard text={`http://localhost:3000/p/event/join/${params.eventId}`} onCopy={() => { setOpenSnackbar(true); setSnackbarText("Öffentlichen Link in die Zwischenablage kopiert.") }}>
 					<ButtonShort size="large" variant="contained">
 						Öffentlichen Link erzeugen
 					</ButtonShort>
 				</CopyToClipboard>
-				<CopyToClipboard text={`http://localhost:3000/o/event/${params.eventId}`} onCopy={() => { setOpenSnackbar(true); setSnackbarText("Link zur Organisator-Ansicht in die Zwischenablage kopiert.") }}>
+				<CopyToClipboard text={`http://localhost:3000/o/event/join/${secret}`} onCopy={() => { setOpenSnackbar(true); setSnackbarText("Link zur Organisator-Ansicht in die Zwischenablage kopiert.") }}>
 					<ButtonShort size="large" variant="contained">
 						Organisator-Zugang teilen
 					</ButtonShort>
