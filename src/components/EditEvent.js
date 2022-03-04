@@ -1,6 +1,5 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
-import { useEffect } from "react";
 
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
@@ -8,26 +7,31 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
+
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import IconButton from "@mui/material/IconButton";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 function EditEvent() {
-	let params = useParams();
+	const { eventId } = useParams();
 
-	const [redirect, setRedirect] = React.useState(null);
-	const [eventDesc, setEventDesc] = React.useState("");
-	const [windowWidth, setWindowWidth] = React.useState(
-		window.innerWidth > 768 ? "50%" : window.innerWidth - 35
-	);
-	const [isMobile, setIsMobile] = React.useState(false);
-	const [selectedFile, setSelectedFile] = React.useState();
-	const [isFilePicked, setIsFilePicked] = React.useState(false);
-	const [selectedImage, setSelectedImage] = React.useState();
-	const [isImagePicked, setIsImagePicked] = React.useState(false);
-	const [changes, setChanges] = React.useState(false);
-	const [eventTitle, setEventTitle] = React.useState(null);
+	const [eventTitle, setEventTitle] = useState(null);
+	const [redirect, setRedirect] = useState(null);
+	const [eventDesc, setEventDesc] = useState("");
+
+	const [selectedFile, setSelectedFile] = useState();
+	const [isFilePicked, setIsFilePicked] = useState(false);
+	const [selectedImage, setSelectedImage] = useState();
+	const [isImagePicked, setIsImagePicked] = useState(false);
+	const [changes, setChanges] = useState(false);
+
+	const [openDeleteEventDialog, toggleDeleteEventDialog] = useState(false);
 
 	const changeHandler = (event) => {
 		setSelectedFile(event.target.files[0]);
@@ -41,7 +45,7 @@ function EditEvent() {
 		setChanges(true);
 	};
 
-	const saveAllChanges = () => {
+	const handleClickSave = () => {
 		if (isFilePicked) {
 			handleSubmission(selectedFile);
 		}
@@ -49,7 +53,7 @@ function EditEvent() {
 			handleSubmission(selectedImage);
 		}
 
-		const requestOptions = {
+		fetch(`/events/${eventId}`, {
 			method: "PUT",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
@@ -57,15 +61,10 @@ function EditEvent() {
 				description: eventDesc,
 				open: true,
 			}),
-		};
-
-		fetch(
-			process.env.REACT_APP_API_URL + `/events/${params.eventId}`,
-			requestOptions
-		)
+		})
 			.then((response) => setChanges(false))
-			.catch((error) => {
-				console.error("Error:", error);
+			.catch((err) => {
+				console.log(err);
 			});
 	};
 
@@ -74,26 +73,19 @@ function EditEvent() {
 
 		formData.append("file", file);
 
-		const requestOptions = {
+		fetch(`/events/${eventId}/file`, {
 			method: "POST",
 			headers: { "Content-Type": "application/pdf" },
 			body: formData,
-		};
-
-		fetch(
-			process.env.REACT_APP_API_URL + `/events/${params.eventId}/file`,
-			requestOptions
-		)
-			.then((response) => console.log("Success:", response))
-			.catch((error) => {
-				console.error("Error:", error);
+		})
+			.then((res) => console.log(res))
+			.catch((err) => {
+				console.error("Error:", err);
 			});
 	};
 
-	const handleFocus = (event) => event.target.select();
-
-	const handleBack = () => {
-		setRedirect(`/o/event/${params.eventId}`);
+	const handleClickCancel = () => {
+		setRedirect(`/o/event/${eventId}`);
 	};
 
 	const removeFile = () => {
@@ -101,34 +93,10 @@ function EditEvent() {
 		setIsFilePicked(false);
 	};
 
-	const removeImage = () => {
-		setSelectedImage(null);
-		setIsImagePicked(false);
-	};
-
-	const ButtonShort = React.forwardRef(function Alert(props, ref) {
-		return (
-			<Button
-				sx={{ width: isMobile ? "100%" : "35%", marginTop: "15px" }}
-				{...props}
-			/>
-		);
-	});
-
-	const handleResize = () => {
-		const windowWidth = window.innerWidth;
-		setWindowWidth(windowWidth > 768 ? "60%" : windowWidth - 35);
-		setIsMobile(windowWidth > 768 ? false : true);
-	};
-
 	const getEventMeta = () => {
-		const requestOptions = {
+		fetch(`/events/${eventId}`, {
 			method: "GET",
-		};
-		fetch(
-			process.env.REACT_APP_API_URL + `/events/${params.eventId}`,
-			requestOptions
-		)
+		})
 			.then((response) => response.json())
 			.then((data) => {
 				setEventTitle(data.title);
@@ -137,162 +105,147 @@ function EditEvent() {
 			.catch((error) => console.log(error));
 	};
 
-	React.useEffect(() => {
-		window.addEventListener("resize", handleResize);
-		handleResize();
+	useEffect(() => {
 		getEventMeta();
-
-		return () => {
-			window.removeEventListener("resize", handleResize);
-		};
 	}, []);
 
+	const deleteEvent = () => {
+		fetch(`/events/${eventId}`, {
+			method: "DELETE",
+		})
+			.then((res) => {
+				if (!res.ok) {
+					Promise.reject();
+				} else {
+					setRedirect("/");
+				}
+			})
+			.catch((err) => console.log(err));
+	};
+
 	if (redirect) {
-		return <Navigate to={redirect} eventId={params.eventId} />;
+		return <Navigate to={redirect} eventId={eventId} />;
 	}
 
 	return (
-		<Box sx={{ width: windowWidth, margin: "auto" }}>
-			<Box
-				sx={{
-					display: "flex",
-					flexDirection: "row",
-					justifyContent: "space-between",
-					marginTop: "15px",
-				}}
+		<React.Fragment>
+			<Dialog
+				open={openDeleteEventDialog}
+				onClose={() => toggleDeleteEventDialog(false)}
+				maxWidth="xs"
 			>
-				<Button size="large" onClick={handleBack} variant="text">
-					<ArrowBackIosIcon
-						sx={{ color: "primary.main", marginRight: "5px" }}
-					/>
-					Zurück
-				</Button>
-			</Box>
-			<input
-				id="selectFile"
-				hidden
-				type="file"
-				name="file"
-				onChange={changeHandler}
-			/>
-			<input
-				id="selectImage"
-				hidden
-				type="file"
-				name="file"
-				onChange={changeImageHandler}
-			/>
-			<TextField
-				multiline
-				onClick={isMobile ? handleFocus : null}
-				value={eventDesc}
-				sx={{ width: "100%" }}
-				id="standard-basic"
-				label="Beschreibung"
-				variant="standard"
-				onChange={(event) => {
-					setEventDesc(event.target.value);
-					setChanges(true);
-				}}
-			/>
-			<Typography sx={{ marginTop: "15px", fontWeight: "bold" }}>
-				Datei
-			</Typography>
-			{isFilePicked ? (
-				<Box>
-					<Button
-						size="large"
-						sx={{ alignSelf: "flex-start" }}
-						color="inherit"
-					>
-						<Stack
-							sx={{ alignItems: "center" }}
-							direction="row"
-							spacing={1}
-						>
-							<AttachFileIcon />
-							<Stack direction="column">
-								<Typography>{selectedFile.name}</Typography>
-								<Typography variant="caption">{`${Math.trunc(
-									selectedFile.size / 1024 / 1024
-								)}MB`}</Typography>
-							</Stack>
-						</Stack>
+				<DialogTitle>Veranstaltung löschen</DialogTitle>
+				<DialogContent>
+					<DialogContentText>
+						Möchten Sie die Veranstaltung wirklich für alle
+						Teilnehmer löschen? Alle gespeicherten Abstimmungen und
+						Ergebnisse werden unwiderruflich gelöscht.
+					</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => toggleDeleteEventDialog(false)}>
+						Abbrechen
 					</Button>
-					<IconButton onClick={removeFile} size="large">
-						<DeleteForeverIcon />
-					</IconButton>
-				</Box>
-			) : (
-				<ButtonShort
-					onClick={() =>
-						document.getElementById("selectFile").click()
-					}
-					size="large"
-					variant="contained"
-				>
-					+ Datei anhängen
-				</ButtonShort>
-			)}
-			<Typography sx={{ marginTop: "15px", fontWeight: "bold" }}>
-				Branding
-			</Typography>
-			{isImagePicked ? (
-				<Box>
-					<Button
-						size="large"
-						sx={{ alignSelf: "flex-start" }}
-						color="inherit"
-					>
-						<Stack
-							sx={{ alignItems: "center" }}
-							direction="row"
-							spacing={1}
-						>
-							<AttachFileIcon />
-							<Stack direction="column">
-								<Typography>{selectedImage.name}</Typography>
-								<Typography variant="caption">{`${Math.trunc(
-									selectedImage.size / 1024 / 1024
-								)}MB`}</Typography>
-							</Stack>
-						</Stack>
+					<Button onClick={deleteEvent} autoFocus>
+						Beenden
 					</Button>
-					<IconButton onClick={removeImage} size="large">
-						<DeleteForeverIcon />
-					</IconButton>
-				</Box>
-			) : (
-				<Stack
-					spacing={2}
-					direction="row"
-					sx={{ alignItems: "center" }}
-				>
-					<ButtonShort
+				</DialogActions>
+			</Dialog>
+
+			<Box padding={3}>
+				<input
+					id="selectFile"
+					hidden
+					type="file"
+					name="file"
+					onChange={changeHandler}
+				/>
+				<TextField
+					multiline
+					value={eventDesc}
+					sx={{ width: "100%" }}
+					id="standard-basic"
+					label="Beschreibung"
+					variant="standard"
+					onChange={(event) => {
+						setEventDesc(event.target.value);
+						setChanges(true);
+					}}
+				/>
+				<Typography sx={{ marginTop: "15px", fontWeight: "bold" }}>
+					Dateianhang
+				</Typography>
+				{isFilePicked ? (
+					<Box>
+						<Button
+							size="large"
+							sx={{ alignSelf: "flex-start" }}
+							color="inherit"
+						>
+							<Stack
+								sx={{ alignItems: "center" }}
+								direction="row"
+								spacing={1}
+							>
+								<AttachFileIcon />
+								<Stack direction="column">
+									<Typography>{selectedFile.name}</Typography>
+									<Typography variant="caption">{`${Math.trunc(
+										selectedFile.size / 1024 / 1024
+									)}MB`}</Typography>
+								</Stack>
+							</Stack>
+						</Button>
+						<IconButton onClick={removeFile} size="large">
+							<DeleteForeverIcon />
+						</IconButton>
+					</Box>
+				) : (
+					<Button
 						onClick={() =>
-							document.getElementById("selectImage").click()
+							document.getElementById("selectFile").click()
 						}
 						size="large"
 						variant="contained"
+						startIcon={<AttachFileIcon />}
+						disableElevation
 					>
-						+ Foto auswählen
-					</ButtonShort>
-					<Typography>oder</Typography>
-					<ButtonShort size="large" variant="contained">
-						Text hinzufügen
-					</ButtonShort>
-				</Stack>
-			)}
-			{changes ? (
-				<ButtonShort
-					onClick={saveAllChanges}
+						Datei auswählen
+					</Button>
+				)}
+
+				<Typography sx={{ fontWeight: "bold" }}>
+					Veranstaltung löschen
+				</Typography>
+				<Button
+					size="large"
+					onClick={() => toggleDeleteEventDialog(true)}
+					variant="contained"
+					color="error"
+				>
+					Veranstaltung löschen
+				</Button>
+
+				<Button
 					size="large"
 					variant="contained"
+					color="inherit"
+					disableElevation
+					onClick={handleClickCancel}
 				>
-					Änderungen Speichern
-				</ButtonShort>
-			) : null}
-		</Box>
+					Abbrechen
+				</Button>
+
+				<Button
+					size="large"
+					variant="contained"
+					disableElevation
+					onClick={handleClickSave}
+				>
+					Speichern
+				</Button>
+			</Box>
+		</React.Fragment>
 	);
 }
 

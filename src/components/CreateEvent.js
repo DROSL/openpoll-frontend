@@ -1,5 +1,5 @@
-import React from "react";
-import { Navigate, useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
@@ -8,126 +8,143 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 
 import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
 
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
+import FormControl from "@mui/material/FormControl";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputAdornment from "@mui/material/InputAdornment";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
+
+import AddIcon from "@mui/icons-material/Add";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Divider from "@mui/material/Divider";
+import SettingsIcon from "@mui/icons-material/Settings";
+import GroupIcon from "@mui/icons-material/Group";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+
+import spooky from "./spooky.svg";
 
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
 function CreateEvent() {
-	let params = useParams();
+	const { eventId } = useParams();
+	const [loading, setLoading] = useState(true);
+	const [redirect, setRedirect] = useState(null);
 
-	const [polls, setPolls] = React.useState([]);
-	const [deleteEventDialog, setDeleteEventDialog] = React.useState(false);
-	const [newPollDialog, setNewPollDialog] = React.useState(false);
-	const [redirect, setRedirect] = React.useState(null);
-	const [eventTitle, setEventTitle] = React.useState(
-		"Titel der Veranstaltung"
-	);
-	const [openSnackbar, setOpenSnackbar] = React.useState(false);
-	const [snackbarText, setSnackbarText] = React.useState("");
-	const [pollTitle, setPollTitle] = React.useState(null);
-	const [secret, setSecret] = React.useState(null);
+	const [evt, setEvent] = useState({
+		title: "Untitled event",
+		code: eventId,
+		secret: null,
+	});
 
-	const handleDeleteEventDialogCloseDialog = () => {
-		setDeleteEventDialog(false);
-	};
+	const [polls, setPolls] = useState([]);
+	const [pollTitle, setPollTitle] = useState(null);
 
-	const handleNewPollDialogCloseDialog = () => {
-		setNewPollDialog(false);
-	};
+	const [openShareDiaglog, toggleShareDialog] = useState(false);
+	const [tab, setTab] = useState(0);
+	const [joinable, setJoinable] = useState(true);
 
-	const handleDeleteEvent = () => {
-		const requestOptions = {
-			method: "DELETE",
-		};
-		fetch(
-			process.env.REACT_APP_API_URL + `/events/${params.eventId}`,
-			requestOptions
-		)
-			.then((response) => {
-				if (!response.ok) {
-					Promise.reject();
-				} else {
-					setRedirect("/");
-				}
+	const [openNewPollDiaglog, toggleNewPollDialog] = useState(false);
+	const [openDeleteEventDialog, toggleDeleteEventDialog] = useState(false);
+
+	const [openSnackbar, toggleSnackbar] = useState(false);
+	const [snackbarText, setSnackbarText] = useState("");
+
+	const getEvent = () => {
+		fetch(`/events/${eventId}`, {
+			method: "GET",
+		})
+			.then((res) => res.json())
+			.then((res) => {
+				setEvent({
+					title: res.title,
+					secret: res.secret,
+				});
+				setJoinable(res.open);
 			})
-			.catch((error) => console.log(error));
+			.catch((err) => {
+				console.log(err);
+			});
 	};
 
-	const handleCreateNewPoll = () => {
-		setNewPollDialog(true);
+	const getPolls = () => {
+		fetch(`/events/${eventId}/polls`, {
+			method: "GET",
+		})
+			.then((res) => res.json())
+			.then((res) => {
+				setPolls(res);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	};
 
-	const handleNewPoll = () => {
+	useEffect(() => {
+		getEvent();
+		getPolls();
+	}, []);
+
+	const createPoll = () => {
 		if (pollTitle != null) {
-			const requestOptions = {
+			fetch(`/events/${eventId}/polls`, {
 				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ title: `${pollTitle}` }),
-			};
-			fetch(
-				process.env.REACT_APP_API_URL +
-					`/events/${params.eventId}/polls`,
-				requestOptions
-			)
-				.then((response) => response.json())
-				.then((data) => {
-					const id = data._id;
-					setRedirect(`/o/event/${params.eventId}/newPoll/${id}`);
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					title: pollTitle,
+				}),
+			})
+				.then((res) => res.json())
+				.then((res) => {
+					setRedirect(`/o/event/${eventId}/newPoll/${res._id}`);
 				})
-				.catch((error) => console.log(error));
+				.catch((err) => console.log(err));
 		}
 	};
 
-	const deletePoll = (id) => {
-		const requestOptions = {
-			method: "DELETE",
-		};
-		fetch(process.env.REACT_APP_API_URL + `/polls/${id}`, requestOptions)
-			.then((response) => getPolls())
-			.catch((error) => console.log(error));
-	};
-
-	const deleteEvent = () => {
-		setDeleteEventDialog(true);
-	};
-
-	const closeSnackbar = () => {
-		setOpenSnackbar(false);
-		setSnackbarText("");
-	};
-
-	const editEvent = () => {
-		setRedirect(`/o/event/${params.eventId}/edit`);
-	};
-
-	const start = (poll) => {
-		const requestOptions = {
+	const startPoll = (poll) => {
+		fetch(`/polls/${poll._id}/start`, {
 			method: "PUT",
-		};
-		fetch(
-			process.env.REACT_APP_API_URL + `/polls/${poll._id}/start`,
-			requestOptions
-		)
-			.then((response) => getPolls())
-			.catch((error) => console.log(error));
+		})
+			.then((res) => getPolls())
+			.catch((err) => console.log(err));
 	};
 
-	const edit = (poll) => {
-		setRedirect(`/o/event/${params.eventId}/newPoll/${poll._id}`);
+	const deletePoll = (id) => {
+		fetch(`/polls/${id}`, {
+			method: "DELETE",
+		})
+			.then((res) => getPolls())
+			.catch((err) => console.log(err));
 	};
 
-	const results = (pollId) => {
-		setRedirect(`/o/event/${params.eventId}/poll/${pollId}/results`);
+	const handleTabChange = (event, newValue) => {
+		setTab(newValue);
 	};
 
 	const Polls = () => {
@@ -144,18 +161,18 @@ function CreateEvent() {
 							sx={{
 								alignItems: "center",
 								justifyContent: "space-between",
-								paddingTop: "5px",
-								paddingBottom: "5px",
+								paddingTop: 5,
+								paddingBottom: 5,
 							}}
 						>
 							<Typography
-								sx={{ marginLeft: "5px" }}
+								sx={{ marginLeft: 5 }}
 							>{`${poll.title}`}</Typography>
 							<Box sx={{ display: "flex", flexDirection: "row" }}>
 								{!poll.activeUntil ? (
 									<Box>
 										<Button
-											onClick={() => start(poll)}
+											onClick={() => startPoll(poll)}
 											size="large"
 											variant="text"
 											color="success"
@@ -164,7 +181,8 @@ function CreateEvent() {
 											Starten
 										</Button>
 										<Button
-											onClick={() => edit(poll)}
+											component={Link}
+											to={`/o/event/${eventId}/newPoll/${poll._id}`}
 											size="large"
 											variant="text"
 											startIcon={<EditIcon />}
@@ -174,7 +192,8 @@ function CreateEvent() {
 									</Box>
 								) : (
 									<Button
-										onClick={() => results(poll._id)}
+										component={Link}
+										to={`/o/event/${eventId}/poll/${poll._id}/results`}
 										size="large"
 										variant="text"
 										startIcon={<BarChartIcon />}
@@ -200,192 +219,200 @@ function CreateEvent() {
 		);
 	};
 
-	const getEventMeta = () => {
-		const requestOptions = {
-			method: "GET",
-		};
-		fetch(
-			process.env.REACT_APP_API_URL + `/events/${params.eventId}`,
-			requestOptions
-		)
-			.then((response) => response.json())
-			.then((data) => {
-				setEventTitle(data.title);
-				setSecret(data.secret);
-			})
-			.catch((error) => console.log(error));
-	};
-
-	const getPolls = () => {
-		const requestOptions = {
-			method: "GET",
-		};
-		fetch(
-			process.env.REACT_APP_API_URL + `/events/${params.eventId}/polls`,
-			requestOptions
-		)
-			.then((response) => response.json())
-			.then((data) => {
-				setPolls(data);
-			})
-			.catch((error) => console.log(error));
-	};
-
-	React.useEffect(() => {
-		getEventMeta();
-		getPolls();
-	}, []);
-
-	if (redirect) {
-		return <Navigate to={redirect} eventId={params.eventId} />;
-	}
-
 	return (
-		<Box sx={{ margin: "25px auto" }}>
+		<React.Fragment>
 			<Dialog
-				open={deleteEventDialog}
-				onClose={handleDeleteEventDialogCloseDialog}
-				aria-labelledby="alert-dialog-title"
-				aria-describedby="alert-dialog-description"
+				open={openShareDiaglog}
+				fullWidth
+				maxWidth="sm"
+				onClose={() => toggleShareDialog(false)}
 			>
-				<DialogTitle id="alert-dialog-title">
-					Veranstaltung löschen?
-				</DialogTitle>
+				<DialogTitle>Veranstaltung teilen</DialogTitle>
 				<DialogContent>
-					<Stack direction="column" spacing={2}>
-						<Typography>
-							Wenn Sie die Veranstaltung löschen, werden alle
-							damit zusammenhängenden Daten unwiderruflich
-							gelöscht.
-						</Typography>
-						<Button
-							size="large"
-							onClick={handleDeleteEvent}
-							variant="contained"
-							color="error"
-							autoFocus
-						>
-							Veranstaltung löschen
-						</Button>
-						<Button
-							size="large"
-							onClick={handleDeleteEventDialogCloseDialog}
-							variant="contained"
-							color="inherit"
-						>
-							Abbrechen
-						</Button>
-					</Stack>
+					<Tabs value={tab} onChange={handleTabChange}>
+						<Tab label="Teilnehmer" />
+						<Tab label="Organisatoren" />
+					</Tabs>
+					{tab == 0 && (
+						<Box mt={2}>
+							<Stack>
+								<FormControl>
+									<FormControlLabel
+										control={
+											<Switch
+												checked={joinable}
+												onChange={(e) => {
+													setJoinable(
+														e.target.checked
+													);
+												}}
+											/>
+										}
+										label="Neue Teilnehmer können der Veranstaltung beitreten"
+									/>
+								</FormControl>
+								<Box mt={2}>
+									<FormControl variant="outlined">
+										<OutlinedInput
+											readOnly
+											autoFocus
+											onFocus={(e) => {
+												e.target.select();
+											}}
+											value={`${eventId}`}
+											endAdornment={
+												<InputAdornment position="end">
+													<IconButton edge="end">
+														<ContentCopyIcon />
+													</IconButton>
+												</InputAdornment>
+											}
+										/>
+									</FormControl>
+								</Box>
+							</Stack>
+						</Box>
+					)}
+					{tab == 1 && (
+						<Stack mt={2} spacing={2}>
+							<Alert severity="warning">
+								<AlertTitle>Achtung</AlertTitle>
+								Organisatoren haben vollen Zugriff auf Ihre
+								Veranstaltung. Teilen Sie den Link nur mit
+								Personen, denen Sie vertrauen!
+							</Alert>
+							<FormControl variant="outlined">
+								<OutlinedInput
+									readOnly
+									fullWidth
+									autoFocus
+									onFocus={(e) => {
+										e.target.select();
+									}}
+									value={`${window.location.origin}/o/event/join/${evt.secret}`}
+									endAdornment={
+										<InputAdornment position="end">
+											<IconButton edge="end">
+												<ContentCopyIcon />
+											</IconButton>
+										</InputAdornment>
+									}
+								/>
+							</FormControl>
+						</Stack>
+					)}
 				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => toggleShareDialog(false)}>
+						Schließen
+					</Button>
+				</DialogActions>
 			</Dialog>
+
 			<Dialog
-				open={newPollDialog}
-				onClose={handleNewPollDialogCloseDialog}
-				aria-labelledby="alert-dialog-title"
-				aria-describedby="alert-dialog-description"
+				open={openNewPollDiaglog}
+				fullWidth
+				maxWidth="sm"
+				onClose={() => toggleNewPollDialog(false)}
 			>
-				<DialogTitle id="alert-dialog-title">
-					Neue Abstimmung erstellen?
-				</DialogTitle>
+				<DialogTitle>Neue Abstimmung</DialogTitle>
 				<DialogContent>
-					<Stack direction="column" spacing={2}>
-						<TextField
-							sx={{ width: "100%" }}
-							id="standard-basic"
-							label="Titel der Abstimmung"
-							variant="standard"
-							onChange={(event) => {
-								setPollTitle(event.target.value);
-							}}
-						/>
-						<Button
-							size="large"
-							onClick={handleNewPoll}
-							variant="contained"
-							autoFocus
-						>
-							Abstimmung Erstellen
-						</Button>
-						<Button
-							size="large"
-							onClick={handleNewPollDialogCloseDialog}
-							color="inherit"
-							variant="contained"
-						>
-							Abbrechen
-						</Button>
-					</Stack>
+					<DialogContentText></DialogContentText>
+					<TextField
+						autoFocus
+						margin="dense"
+						fullWidth
+						variant="standard"
+						label="Titel"
+						placeholder="Welcher ist der längste Fluss der Welt?"
+						onChange={(e) => {
+							setPollTitle(e.target.value);
+						}}
+					/>
 				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => toggleNewPollDialog(false)}>
+						Abbrechen
+					</Button>
+					<Button onClick={createPoll}>Erstellen</Button>
+				</DialogActions>
 			</Dialog>
-			<Stack padding={3} spacing={2}>
-				<Box
-					sx={{
-						display: "flex",
-						flexDirection: "row",
-						justifyContent: "space-between",
-						alignItems: "center",
-					}}
-				>
-					<Typography variant="h4">
-						{eventTitle}
-					</Typography>
-					<Button onClick={editEvent}>
-						<ModeEditIcon />
-					</Button>
-				</Box>
-				<Typography sx={{ fontWeight: "bold" }}>
-					Abstimmungen
-				</Typography>
-				<Stack direction="column">{polls ? <Polls /> : null}</Stack>
-				<Button
-					size="large"
-					variant="contained"
-					color="success"
-					onClick={handleCreateNewPoll}
-				>
-					+ Neue Abstimmung
-				</Button>
-				<Typography sx={{ fontWeight: "bold" }}>
-					Veranstaltung teilen
-				</Typography>
-				<CopyToClipboard
-					text={`http://localhost:3000/p/event/join/${params.eventId}`}
-					onCopy={() => {
-						setOpenSnackbar(true);
-						setSnackbarText(
-							"Öffentlichen Link in die Zwischenablage kopiert."
-						);
-					}}
-				>
-					<Button size="large" variant="contained">
-						Öffentlichen Link erzeugen
-					</Button>
-				</CopyToClipboard>
-				<CopyToClipboard
-					text={`http://localhost:3000/o/event/join/${secret}`}
-					onCopy={() => {
-						setOpenSnackbar(true);
-						setSnackbarText(
-							"Link zur Organisator-Ansicht in die Zwischenablage kopiert."
-						);
-					}}
-				>
-					<Button size="large" variant="contained">
-						Organisator-Zugang teilen
-					</Button>
-				</CopyToClipboard>
-				<Typography sx={{ fontWeight: "bold" }}>
-					Veranstaltung löschen
-				</Typography>
-				<Button
-					size="large"
-					onClick={deleteEvent}
-					variant="contained"
-					color="error"
-				>
-					Veranstaltung löschen
-				</Button>
-			</Stack>
+
+			<Box padding={3}>
+				<Stack spacing={2}>
+					<Typography variant="h4">{evt.title}</Typography>
+
+					<List>
+						<ListItem
+							component={Link}
+							to={`/o/event/${eventId}/edit`}
+							button
+						>
+							<ListItemIcon>
+								<SettingsIcon />
+							</ListItemIcon>
+							<ListItemText
+								primary="Veranstaltung anpassen"
+								secondary="Titel, Beschreibung und Dateianhang bearbeiten oder Veranstaltung löschen"
+							/>
+							<ChevronRightIcon />
+						</ListItem>
+						<ListItem
+							button
+							onClick={() => toggleShareDialog(true)}
+						>
+							<ListItemIcon>
+								<GroupIcon />
+							</ListItemIcon>
+							<ListItemText
+								primary="Teilnehmer einladen"
+								secondary="Event-Code anzeigen oder Organisator-Zugang teilen"
+							/>
+							<ChevronRightIcon />
+						</ListItem>
+					</List>
+
+					<Typography variant="h6">Abstimmungen</Typography>
+
+					<Box
+						sx={{
+							width: "100%",
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
+						}}
+					>
+						<Stack direction="column" alignItems="center">
+							<img
+								src={spooky}
+								alt="Noch keine Abstimmungen erstellt"
+								width="150px"
+							/>
+							<Typography sx={{ mt: 2, fontWeight: "bold" }}>
+								Ziemlich leer hier
+							</Typography>
+							<Typography>
+								Beginnen Sie, indem Sie ihre erste Abstimmung
+								erstellen!
+							</Typography>
+							<Button
+								size="large"
+								variant="contained"
+								color="primary"
+								disableElevation
+								startIcon={<AddIcon />}
+								onClick={() => toggleNewPollDialog(true)}
+								sx={{ mt: 2 }}
+							>
+								Neue Abstimmung
+							</Button>
+						</Stack>
+					</Box>
+
+					<Stack direction="column">{polls ? <Polls /> : null}</Stack>
+				</Stack>
+			</Box>
+
 			<Snackbar
 				open={openSnackbar}
 				autoHideDuration={3000}
@@ -393,10 +420,20 @@ function CreateEvent() {
 					vertical: "bottom",
 					horizontal: "center",
 				}}
-				onClose={closeSnackbar}
+				onClose={() => toggleSnackbar(false)}
 				message={snackbarText}
+				action={
+					<IconButton
+						size="small"
+						aria-label="close"
+						color="inherit"
+						onClick={() => toggleSnackbar(false)}
+					>
+						<CloseIcon fontSize="small" />
+					</IconButton>
+				}
 			/>
-		</Box>
+		</React.Fragment>
 	);
 }
 
