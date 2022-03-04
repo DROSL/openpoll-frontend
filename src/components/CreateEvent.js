@@ -1,6 +1,5 @@
-import * as React from "react";
+import React from "react";
 import { Navigate, useParams } from "react-router-dom";
-import { useEffect } from "react";
 
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
@@ -33,19 +32,10 @@ function CreateEvent() {
 	const [eventTitle, setEventTitle] = React.useState(
 		"Titel der Veranstaltung"
 	);
-	const [eventDesc, setEventDesc] = React.useState(
-		"Lorem ipsum dolor sit amet, consetetur sadipscing elitr..."
-	);
-	const [windowWidth, setWindowWidth] = React.useState(
-		window.innerWidth > 768 ? "50%" : window.innerWidth - 35
-	);
 	const [openSnackbar, setOpenSnackbar] = React.useState(false);
 	const [snackbarText, setSnackbarText] = React.useState("");
-	const [isMobile, setIsMobile] = React.useState(false);
 	const [pollTitle, setPollTitle] = React.useState(null);
 	const [secret, setSecret] = React.useState(null);
-
-	const handleFocus = (event) => event.target.select();
 
 	const handleDeleteEventDialogCloseDialog = () => {
 		setDeleteEventDialog(false);
@@ -210,20 +200,6 @@ function CreateEvent() {
 		);
 	};
 
-	const Alert = React.forwardRef(function Alert(props, ref) {
-		return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-	});
-
-	const ButtonShort = React.forwardRef(function Alert(props, ref) {
-		return <Button sx={{ width: isMobile ? "100%" : "35%" }} {...props} />;
-	});
-
-	const handleResize = () => {
-		const windowWidth = window.innerWidth;
-		setWindowWidth(windowWidth > 768 ? "60%" : windowWidth - 35);
-		setIsMobile(windowWidth > 768 ? false : true);
-	};
-
 	const getEventMeta = () => {
 		const requestOptions = {
 			method: "GET",
@@ -256,15 +232,8 @@ function CreateEvent() {
 	};
 
 	React.useEffect(() => {
-		window.addEventListener("resize", handleResize);
-
 		getEventMeta();
 		getPolls();
-		handleResize();
-
-		return () => {
-			window.removeEventListener("resize", handleResize);
-		};
 	}, []);
 
 	if (redirect) {
@@ -272,7 +241,7 @@ function CreateEvent() {
 	}
 
 	return (
-		<Box sx={{ width: windowWidth, margin: "auto", marginTop: "25px" }}>
+		<Box sx={{ margin: "25px auto" }}>
 			<Dialog
 				open={deleteEventDialog}
 				onClose={handleDeleteEventDialogCloseDialog}
@@ -321,7 +290,6 @@ function CreateEvent() {
 				<DialogContent>
 					<Stack direction="column" spacing={2}>
 						<TextField
-							onClick={isMobile ? handleFocus : null}
 							sx={{ width: "100%" }}
 							id="standard-basic"
 							label="Titel der Abstimmung"
@@ -349,7 +317,7 @@ function CreateEvent() {
 					</Stack>
 				</DialogContent>
 			</Dialog>
-			<Stack margin="15px" spacing={2}>
+			<Stack padding={3} spacing={2}>
 				<Box
 					sx={{
 						display: "flex",
@@ -358,7 +326,7 @@ function CreateEvent() {
 						alignItems: "center",
 					}}
 				>
-					<Typography sx={{ typography: isMobile ? "h5" : "h4" }}>
+					<Typography variant="h4">
 						{eventTitle}
 					</Typography>
 					<Button onClick={editEvent}>
@@ -369,14 +337,14 @@ function CreateEvent() {
 					Abstimmungen
 				</Typography>
 				<Stack direction="column">{polls ? <Polls /> : null}</Stack>
-				<ButtonShort
+				<Button
 					size="large"
 					variant="contained"
 					color="success"
 					onClick={handleCreateNewPoll}
 				>
 					+ Neue Abstimmung
-				</ButtonShort>
+				</Button>
 				<Typography sx={{ fontWeight: "bold" }}>
 					Veranstaltung teilen
 				</Typography>
@@ -389,9 +357,9 @@ function CreateEvent() {
 						);
 					}}
 				>
-					<ButtonShort size="large" variant="contained">
+					<Button size="large" variant="contained">
 						Öffentlichen Link erzeugen
-					</ButtonShort>
+					</Button>
 				</CopyToClipboard>
 				<CopyToClipboard
 					text={`http://localhost:3000/o/event/join/${secret}`}
@@ -402,39 +370,32 @@ function CreateEvent() {
 						);
 					}}
 				>
-					<ButtonShort size="large" variant="contained">
+					<Button size="large" variant="contained">
 						Organisator-Zugang teilen
-					</ButtonShort>
+					</Button>
 				</CopyToClipboard>
 				<Typography sx={{ fontWeight: "bold" }}>
 					Veranstaltung löschen
 				</Typography>
-				<ButtonShort
+				<Button
 					size="large"
 					onClick={deleteEvent}
 					variant="contained"
 					color="error"
 				>
 					Veranstaltung löschen
-				</ButtonShort>
+				</Button>
 			</Stack>
 			<Snackbar
 				open={openSnackbar}
 				autoHideDuration={3000}
-				onClose={closeSnackbar}
 				anchorOrigin={{
 					vertical: "bottom",
 					horizontal: "center",
 				}}
-			>
-				<Alert
-					onClose={closeSnackbar}
-					severity="info"
-					sx={{ width: "100%" }}
-				>
-					{snackbarText}
-				</Alert>
-			</Snackbar>
+				onClose={closeSnackbar}
+				message={snackbarText}
+			/>
 		</Box>
 	);
 }
