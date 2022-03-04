@@ -17,50 +17,66 @@ class Home extends React.Component {
 		error: null,
 		eventCode: null,
 		eventTitle: null,
-		containerWidth: '100%',
+		containerWidth: "100%",
 	};
 
 	componentDidMount() {
-		window.addEventListener('resize', this.handleWindowSizeChange);
+		window.addEventListener("resize", this.handleWindowSizeChange);
 	}
 
 	handleWindowSizeChange = () => {
 		const windowWidth = window.innerWidth;
-		this.setState({ containerWidth: windowWidth > 768 ? '60%' : windowWidth });
-	}
+		this.setState({
+			containerWidth: windowWidth > 768 ? "60%" : windowWidth,
+		});
+	};
 
 	status = (res) => {
 		if (!res.ok) {
-			return Promise.reject()
+			return Promise.reject();
 		}
 		return res;
-	}
+	};
 
 	toggleJoin = () => {
-		this.setState((prev) => ({ showJoin: !prev.showJoin, error: false, eventCode: null }));
+		this.setState((prev) => ({
+			showJoin: !prev.showJoin,
+			error: false,
+			eventCode: null,
+		}));
 	};
 
 	toggleCreate = () => {
-		this.setState((prev) => ({ showCreate: !prev.showCreate, error: false }));
+		this.setState((prev) => ({
+			showCreate: !prev.showCreate,
+			error: false,
+		}));
 	};
 
 	joinEvent = () => {
-		this.setState({ error: false })
+		this.setState({ error: false });
 		if (this.state.eventCode) {
-			this.setState({ loading: true })
+			this.setState({ loading: true });
 			const requestOptions = {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ code: this.state.eventCode })
-			}
-			fetch(process.env.REACT_APP_API_URL + `/events/${this.state.eventCode}/join`, requestOptions)
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ code: this.state.eventCode }),
+			};
+			fetch(
+				process.env.REACT_APP_API_URL +
+					`/events/${this.state.eventCode}/join`,
+				requestOptions
+			)
 				.then(this.status)
-				.then(data =>
-					this.setState({ loading: false, redirect: `/p/event/${this.state.eventCode}` })
+				.then((data) =>
+					this.setState({
+						loading: false,
+						redirect: `/p/event/${this.state.eventCode}`,
+					})
 				)
-				.catch(error => {
-					this.setState({ error: true, loading: false })
-				})
+				.catch((error) => {
+					this.setState({ error: true, loading: false });
+				});
 		}
 	};
 
@@ -69,32 +85,38 @@ class Home extends React.Component {
 	};
 
 	createEvent = () => {
-		this.setState({ loading: true })
+		this.setState({ loading: true });
 		const requestOptions = {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ title: this.state.eventTitle })
-		}
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ title: this.state.eventTitle }),
+		};
 		fetch(process.env.REACT_APP_API_URL + "/events", requestOptions)
-			.then(response => response.json())
-			.then(data =>
+			.then((response) => response.json())
+			.then((data) =>
 				this.setState({ redirect: `/o/event/${data.code}` })
 			)
-			.catch(error => {
-				this.setState({ error: true, loading: false })
-			})
-	}
+			.catch((error) => {
+				this.setState({ error: true, loading: false });
+			});
+	};
 
 	handleKeyDown = (e) => {
-		this.setState({ error: false })
-		if (e.key === 'Enter') {
+		this.setState({ error: false });
+		if (e.key === "Enter") {
 			this.joinEvent();
 		}
-	}
-
+	};
 
 	render() {
-		const { showJoin, showCreate, redirect, loading, error, containerWidth } = this.state;
+		const {
+			showJoin,
+			showCreate,
+			redirect,
+			loading,
+			error,
+			containerWidth,
+		} = this.state;
 
 		if (redirect) {
 			return <Navigate to={redirect} />;
@@ -102,19 +124,25 @@ class Home extends React.Component {
 
 		return (
 			<React.Fragment>
-				<Box sx={{
-					width: { containerWidth },
-					marginTop: '40vh',
-					alignItems: 'center',
-					justifyContent: 'center',
-				}}>
-					<Stack spacing={2} direction="column" sx={{
-						margin: 'auto',
-						width: '75%',
-						maxWidth: '500px',
-						alignItems: 'center',
-						justifyContent: 'center'
-					}}>
+				<Box
+					sx={{
+						width: { containerWidth },
+						marginTop: "40vh",
+						alignItems: "center",
+						justifyContent: "center",
+					}}
+				>
+					<Stack
+						spacing={2}
+						direction="column"
+						sx={{
+							margin: "auto",
+							width: "75%",
+							maxWidth: "500px",
+							alignItems: "center",
+							justifyContent: "center",
+						}}
+					>
 						{showJoin ? (
 							<React.Fragment>
 								{error ? (
@@ -124,15 +152,22 @@ class Home extends React.Component {
 								) : null}
 								<TextField
 									sx={{
-										width: '100%',
+										width: "100%",
 									}}
-									color={error ? 'error' : 'primary'}
-									onChange={(e) => this.setState({ eventCode: e.target.value })} variant="outlined" label="Code"
-									onKeyDown={this.handleKeyDown} />
+									color={error ? "error" : "primary"}
+									onChange={(e) =>
+										this.setState({
+											eventCode: e.target.value,
+										})
+									}
+									variant="outlined"
+									label="Code"
+									onKeyDown={this.handleKeyDown}
+								/>
 								<Button
 									size="large"
 									sx={{
-										width: '100%',
+										width: "100%",
 									}}
 									variant="contained"
 									onClick={this.joinEvent}
@@ -143,7 +178,7 @@ class Home extends React.Component {
 								<Button
 									size="large"
 									sx={{
-										width: '100%',
+										width: "100%",
 									}}
 									variant="contained"
 									color="inherit"
@@ -155,22 +190,30 @@ class Home extends React.Component {
 							</React.Fragment>
 						) : (
 							<React.Fragment>
-								{showCreate ?
-									(<React.Fragment>
+								{showCreate ? (
+									<React.Fragment>
 										{error ? (
 											<Alert severity="error">
-												Konnte keine Veranstaltung erstellen!
+												Konnte keine Veranstaltung
+												erstellen!
 											</Alert>
 										) : null}
 										<TextField
 											sx={{
-												width: '100%',
+												width: "100%",
 											}}
-											onChange={(e) => this.setState({ eventTitle: e.target.value })} variant="outlined" label="Titel" />
+											onChange={(e) =>
+												this.setState({
+													eventTitle: e.target.value,
+												})
+											}
+											variant="outlined"
+											label="Titel"
+										/>
 										<Button
 											size="large"
 											sx={{
-												width: '100%',
+												width: "100%",
 											}}
 											variant="contained"
 											onClick={this.createEvent}
@@ -181,7 +224,7 @@ class Home extends React.Component {
 										<Button
 											size="large"
 											sx={{
-												width: '100%',
+												width: "100%",
 											}}
 											variant="contained"
 											color="inherit"
@@ -190,45 +233,45 @@ class Home extends React.Component {
 										>
 											Zurück
 										</Button>
-									</React.Fragment>)
-									:
-									(
-										<React.Fragment>
-											{error ? (
-												<Alert severity="error">
-													Konnte keiner Veranstaltung beitreten!
-												</Alert>
-											) : null}
-											<Button
-												size="large"
-												sx={{
-													width: '100%',
-												}}
-												variant="contained"
-												onClick={this.toggleJoin}
-												disabled={loading}
-											>
-												Veranstaltung beitreten
-											</Button>
-											<Button
-												size="large"
-												sx={{
-													width: '100%',
-												}}
-												variant="contained"
-												onClick={this.newEvent}
-												disabled={loading}
-											>
-												Neue Veranstaltung
-											</Button>
-										</React.Fragment>)}
+									</React.Fragment>
+								) : (
+									<React.Fragment>
+										{error ? (
+											<Alert severity="error">
+												Konnte keiner Veranstaltung
+												beitreten!
+											</Alert>
+										) : null}
+										<Button
+											size="large"
+											sx={{
+												width: "100%",
+											}}
+											variant="contained"
+											onClick={this.toggleJoin}
+											disabled={loading}
+										>
+											Veranstaltung beitreten
+										</Button>
+										<Button
+											size="large"
+											sx={{
+												width: "100%",
+											}}
+											variant="contained"
+											onClick={this.newEvent}
+											disabled={loading}
+										>
+											Neue Veranstaltung
+										</Button>
+									</React.Fragment>
+								)}
 							</React.Fragment>
-						)
-						}
+						)}
 						{loading ? <CircularProgress size={24} /> : null}
-					</Stack >
-				</Box >
-			</React.Fragment >
+					</Stack>
+				</Box>
+			</React.Fragment>
 		);
 	}
 }
