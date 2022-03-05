@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useParams, Link } from "react-router-dom";
 
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
@@ -18,51 +18,56 @@ import IconButton from "@mui/material/IconButton";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
-function EditEvent() {
+function EditEventDialog() {
 	const { eventId } = useParams();
 
-	const [eventTitle, setEventTitle] = useState(null);
-	const [redirect, setRedirect] = useState(null);
-	const [eventDesc, setEventDesc] = useState("");
+	const [title, setTitle] = useState("Untitled event");
+	const [description, setDescription] = useState("");
 
-	const [selectedFile, setSelectedFile] = useState();
-	const [isFilePicked, setIsFilePicked] = useState(false);
-	const [selectedImage, setSelectedImage] = useState();
-	const [isImagePicked, setIsImagePicked] = useState(false);
-	const [changes, setChanges] = useState(false);
+	const [localFile, setLocalFile] = useState(null);
 
 	const [openDeleteEventDialog, toggleDeleteEventDialog] = useState(false);
 
-	const changeHandler = (event) => {
-		setSelectedFile(event.target.files[0]);
-		setIsFilePicked(true);
-		setChanges(true);
+	const [redirect, setRedirect] = useState(null);
+
+	const getEvent = () => {
+		fetch(`/events/${eventId}`, {
+			method: "GET",
+		})
+			.then((res) => res.json())
+			.then((res) => {
+				setTitle(res.title);
+				setDescription(res.description);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	};
 
-	const changeImageHandler = (event) => {
-		setSelectedImage(event.target.files[0]);
-		setIsImagePicked(true);
-		setChanges(true);
+	useEffect(() => {
+		getEvent();
+	}, []);
+
+	const changeHandler = (event) => {
+		setLocalFile(event.target.files[0]);
 	};
 
 	const handleClickSave = () => {
-		if (isFilePicked) {
-			handleSubmission(selectedFile);
-		}
-		if (isImagePicked) {
-			handleSubmission(selectedImage);
+		if (localFile) {
+			handleSubmission(localFile);
 		}
 
 		fetch(`/events/${eventId}`, {
 			method: "PUT",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
-				title: eventTitle,
-				description: eventDesc,
-				open: true,
+				title: title,
+				description: description,
 			}),
 		})
-			.then((response) => setChanges(false))
+			.then((res) => {
+				console.log(res);
+			})
 			.catch((err) => {
 				console.log(err);
 			});
@@ -80,34 +85,9 @@ function EditEvent() {
 		})
 			.then((res) => console.log(res))
 			.catch((err) => {
-				console.error("Error:", err);
+				console.log(err);
 			});
 	};
-
-	const handleClickCancel = () => {
-		setRedirect(`/o/event/${eventId}`);
-	};
-
-	const removeFile = () => {
-		setSelectedFile(null);
-		setIsFilePicked(false);
-	};
-
-	const getEventMeta = () => {
-		fetch(`/events/${eventId}`, {
-			method: "GET",
-		})
-			.then((response) => response.json())
-			.then((data) => {
-				setEventTitle(data.title);
-				if (data.description) setEventDesc(data.description);
-			})
-			.catch((error) => console.log(error));
-	};
-
-	useEffect(() => {
-		getEventMeta();
-	}, []);
 
 	const deleteEvent = () => {
 		fetch(`/events/${eventId}`, {
@@ -124,7 +104,7 @@ function EditEvent() {
 	};
 
 	if (redirect) {
-		return <Navigate to={redirect} eventId={eventId} />;
+		return <Navigate to={redirect} />;
 	}
 
 	return (
@@ -147,12 +127,39 @@ function EditEvent() {
 						Abbrechen
 					</Button>
 					<Button onClick={deleteEvent} autoFocus>
-						Beenden
+						Endgültig löschen
 					</Button>
 				</DialogActions>
 			</Dialog>
 
-			<Box padding={3}>
+			<Stack direction="column" padding={3} spacing={2}>
+				<Typography variant="h6">Veranstaltung anpassen</Typography>
+
+				<TextField
+					fullWidth
+					variant="outlined"
+					label="Titel"
+					value={title}
+					onChange={(e) => {
+						setTitle(e.target.value);
+					}}
+				/>
+
+				<TextField
+					fullWidth
+					multiline
+					minRows={4}
+					maxRows={8}
+					variant="outlined"
+					value={description}
+					label="Beschreibung (optional)"
+					placeholder="Bei dieser Veranstaltung geht es um..."
+					onChange={(e) => {
+						setDescription(e.target.value);
+					}}
+				/>
+
+				<Typography sx={{ fontWeight: "bold" }}>Dateianhang</Typography>
 				<input
 					id="selectFile"
 					hidden
@@ -160,22 +167,7 @@ function EditEvent() {
 					name="file"
 					onChange={changeHandler}
 				/>
-				<TextField
-					multiline
-					value={eventDesc}
-					sx={{ width: "100%" }}
-					id="standard-basic"
-					label="Beschreibung"
-					variant="standard"
-					onChange={(event) => {
-						setEventDesc(event.target.value);
-						setChanges(true);
-					}}
-				/>
-				<Typography sx={{ marginTop: "15px", fontWeight: "bold" }}>
-					Dateianhang
-				</Typography>
-				{isFilePicked ? (
+				{localFile ? (
 					<Box>
 						<Button
 							size="large"
@@ -189,14 +181,19 @@ function EditEvent() {
 							>
 								<AttachFileIcon />
 								<Stack direction="column">
-									<Typography>{selectedFile.name}</Typography>
+									<Typography>{localFile.name}</Typography>
 									<Typography variant="caption">{`${Math.trunc(
-										selectedFile.size / 1024 / 1024
+										localFile.size / 1024 / 1024
 									)}MB`}</Typography>
 								</Stack>
 							</Stack>
 						</Button>
-						<IconButton onClick={removeFile} size="large">
+						<IconButton
+							onClick={() => {
+								setLocalFile(null);
+							}}
+							size="large"
+						>
 							<DeleteForeverIcon />
 						</IconButton>
 					</Box>
@@ -217,36 +214,42 @@ function EditEvent() {
 				<Typography sx={{ fontWeight: "bold" }}>
 					Veranstaltung löschen
 				</Typography>
-				<Button
-					size="large"
-					onClick={() => toggleDeleteEventDialog(true)}
-					variant="contained"
-					color="error"
-				>
-					Veranstaltung löschen
-				</Button>
+				<Box>
+					<Button
+						size="large"
+						onClick={() => toggleDeleteEventDialog(true)}
+						variant="contained"
+						color="error"
+						disableElevation
+					>
+						Veranstaltung löschen
+					</Button>
+				</Box>
 
-				<Button
-					size="large"
-					variant="contained"
-					color="inherit"
-					disableElevation
-					onClick={handleClickCancel}
-				>
-					Abbrechen
-				</Button>
+				<Stack direction="row" spacing={2}>
+					<Button
+						component={Link}
+						to={`/o/event/${eventId}`}
+						size="large"
+						variant="contained"
+						color="inherit"
+						disableElevation
+					>
+						Abbrechen
+					</Button>
 
-				<Button
-					size="large"
-					variant="contained"
-					disableElevation
-					onClick={handleClickSave}
-				>
-					Speichern
-				</Button>
-			</Box>
+					<Button
+						size="large"
+						variant="contained"
+						disableElevation
+						onClick={handleClickSave}
+					>
+						Speichern
+					</Button>
+				</Stack>
+			</Stack>
 		</React.Fragment>
 	);
 }
 
-export default EditEvent;
+export default EditEventDialog;

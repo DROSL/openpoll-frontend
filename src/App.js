@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import { ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider, useTheme } from "@mui/material/styles";
 import theme from "./theme";
-import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import Box from "@mui/material/Box";
@@ -17,9 +16,9 @@ import Home from "./components/Home";
 import EventViewP from "./components/EventViewP";
 import VoteP from "./components/VoteP";
 import ResultsP from "./components/ResultsP";
-import CreateEvent from "./components/CreateEvent";
+import CreateEvent from "./components/ManageEvent";
 import NewPoll from "./components/NewPoll";
-import EditEvent from "./components/EditEvent";
+import EditEvent from "./components/EditEventDialog";
 import ResultsO from "./components/ResultsO";
 import JoinO from "./components/JoinO";
 import JoinP from "./components/JoinP";
