@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import { ThemeProvider, useTheme } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import Dialog from "@mui/material/Dialog";
@@ -45,33 +45,30 @@ function CreatePollDialog(props) {
 	const desktop = useMediaQuery(theme.breakpoints.up("md"));
 
 	const [title, setTitle] = useState("");
-
 	const [answers, setAnswers] = useState([""]);
 	const [checked, setChecked] = useState(false);
 	const [count, setCount] = useState(1);
 
-	const createCloseHandler = () => {
+	useEffect(() => {
 		setTitle("");
 		setAnswers([""]);
 		setChecked(false);
 		setCount(1);
-
-		handleClose();
-	};
+	}, [open]);
 
 	const createCreateHandler = () => {
 		handleCreate(title, answers, checked, count);
 	};
 
-    const handleChange = (event) => {
-        // TODO: positive integer verification
-        setCount(event.target.value);
-    }
+	const handleChange = (event) => {
+		// TODO: positive integer verification
+		setCount(event.target.value);
+	};
 
 	return (
 		<Dialog
 			open={open}
-			onClose={createCloseHandler}
+			onClose={handleClose}
 			fullWidth
 			maxWidth="sm"
 			fullScreen={!desktop}
@@ -85,7 +82,7 @@ function CreatePollDialog(props) {
 						<IconButton
 							edge="start"
 							color="inherit"
-							onClick={createCloseHandler}
+							onClick={handleClose}
 							aria-label="close"
 						>
 							<CloseIcon />
@@ -195,19 +192,21 @@ function CreatePollDialog(props) {
 						variant="standard"
 						type="number"
 						inputProps={{ min: 1 }}
-                        sx={{width: 50}}
+						sx={{ width: 50 }}
 						value={count}
 						onChange={handleChange}
 					/>
 					<Typography sx={{ ml: 1 }}>
-						{count > 1 ? " Stimmen pro Teilnehmer" : " Stimme pro Teilnehmer"}
+						{count > 1
+							? " Stimmen pro Teilnehmer"
+							: " Stimme pro Teilnehmer"}
 					</Typography>
 				</Box>
 			</DialogContent>
 
 			{desktop && (
 				<DialogActions>
-					<Button onClick={createCloseHandler}>Abbrechen</Button>
+					<Button onClick={handleClose}>Abbrechen</Button>
 					<Button onClick={createCreateHandler}>Speichern</Button>
 				</DialogActions>
 			)}

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -20,8 +22,6 @@ import Divider from "@mui/material/Divider";
 
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import SettingsBackupRestoreIcon from "@mui/icons-material/SettingsBackupRestore";
-import DeleteIcon from "@mui/icons-material/Delete";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 function ListPolls(props) {
@@ -36,9 +36,12 @@ function ListPolls(props) {
 		deleteResults,
 	} = props;
 
-	const activePolls = polls;
-	const savedPolls = polls;
-	const finishedPolls = polls;
+	const activePolls = polls.filter((poll) => poll.started && !poll.stopped);
+	const savedPolls = polls.filter((poll) => !poll.started);
+	const finishedPolls = polls.filter((poll) => poll.started && poll.stopped);
+
+	const theme = useTheme();
+	const desktop = useMediaQuery(theme.breakpoints.up("md"));
 
 	const [selectedPoll, setSelectedPoll] = useState(null);
 
@@ -91,15 +94,18 @@ function ListPolls(props) {
 								secondary="03:54 verbleibend"
 							/>
 							<Stack direction="row" spacing={1}>
-								<Button
-									component={Link}
-									to={`/o/event/${eventId}/poll/${poll._id}/results`}
-									variant="contained"
-									startIcon={<BarChartIcon />}
-									disableElevation
-								>
-									Ergebnisse
-								</Button>
+								{desktop && (
+									<Button
+										disableElevation
+										variant="contained"
+										startIcon={<BarChartIcon />}
+										onClick={() => {
+											showResults(poll._id);
+										}}
+									>
+										Ergebnisse
+									</Button>
+								)}
 								<IconButton
 									onClick={createClickHandler1(poll._id)}
 								>
@@ -166,11 +172,12 @@ function ListPolls(props) {
 								secondary="4 Antwortmöglichkeiten"
 							/>
 							<Stack direction="row" spacing={1}>
-								{activePolls.length == 0 && (
+								{desktop && activePolls.length == 0 && (
 									<Button
+										disableElevation
 										variant="contained"
 										startIcon={<PlayArrowIcon />}
-										disableElevation
+										onClick={() => startPoll(poll._id)}
 									>
 										Starten
 									</Button>

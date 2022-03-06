@@ -30,7 +30,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 	return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function ShareDialog(props) {
+function ShareEventDialog(props) {
 	const { open, handleClose, code, secret } = props;
 
 	const [tab, setTab] = useState(0);
@@ -80,7 +80,7 @@ function ShareDialog(props) {
 										autoFocus
 										value={
 											showLink
-												? `${window.location.origin}/j/${code}`
+												? `${window.location.origin}/c/${code}`
 												: code
 										}
 										onFocus={(e) => {
@@ -126,7 +126,7 @@ function ShareDialog(props) {
 								onFocus={(e) => {
 									e.target.select();
 								}}
-								value={`${window.location.origin}/o/event/join/${secret}`}
+								value={`${window.location.origin}/s/${secret}`}
 								endAdornment={
 									<InputAdornment position="end">
 										<IconButton edge="end">
@@ -146,4 +146,4 @@ function ShareDialog(props) {
 	);
 }
 
-export default ShareDialog;
+export default ShareEventDialog;

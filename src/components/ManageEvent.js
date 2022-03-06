@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { Navigate, Link, useParams } from "react-router-dom";
 
-import { ThemeProvider, useTheme } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import Box from "@mui/material/Box";
@@ -25,10 +25,12 @@ import GroupIcon from "@mui/icons-material/Group";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CloseIcon from "@mui/icons-material/Close";
 
-import ShareDialog from "./ShareDialog";
+import EditEventDialog from "./EditEventDialog";
+import ShareEventDialog from "./ShareEventDialog";
 import CreatePollDialog from "./CreatePollDialog";
 import ListPolls from "./ListPollsO";
 import CreatePollFiller from "./CreatePollFiller";
+import DeleteEventDialog from "./DeleteEventDialog";
 
 function ManageEvent() {
 	const { eventId } = useParams();
@@ -39,27 +41,32 @@ function ManageEvent() {
 	const [loading, setLoading] = useState(true);
 	const [redirect, setRedirect] = useState(null);
 
-	const [title, setTitle] = useState("Untitled event");
+	const [title, setTitle] = useState("Unbenannte Veranstaltung");
+	const [description, setDescription] = useState("");
+	const [file, setFile] = useState(null);
 	const [secret, setSecret] = useState("");
 	const [joinable, setJoinable] = useState(true);
 
 	const [polls, setPolls] = useState([]);
 	const [pollTitle, setPollTitle] = useState(null);
 
-	const [openShareDiaglog, toggleShareDialog] = useState(false);
-
+	const [openEditEventDialog, toggleEditEventDialog] = useState(false);
+	const [openDeleteEventDialog, toggleDeleteEventDialog] = useState(false);
+	const [openShareDiaglog, toggleShareEventDialog] = useState(false);
 	const [openNewPollDialog, toggleNewPollDialog] = useState(false);
 
 	const [openSnackbar, toggleSnackbar] = useState(false);
 	const [snackbarText, setSnackbarText] = useState("");
 
-	useEffect(() => {
+	const getEvent = () => {
 		fetch(`/events/${eventId}`, {
 			method: "GET",
 		})
 			.then((res) => res.json())
 			.then((res) => {
 				setTitle(res.title);
+				setDescription(res.description);
+				setFile(res.file);
 				setSecret(res.secret);
 				setJoinable(res.open);
 				setLoading(false);
@@ -67,9 +74,9 @@ function ManageEvent() {
 			.catch((err) => {
 				console.log(err);
 			});
+	};
 
-		//return;
-
+	const getPolls = () => {
 		fetch(`/events/${eventId}/polls`, {
 			method: "GET",
 		})
@@ -80,7 +87,37 @@ function ManageEvent() {
 			.catch((err) => {
 				console.log(err);
 			});
+	};
+
+	useEffect(() => {
+		getEvent();
+		getPolls();
 	}, []);
+
+	const editEvent = (title, description, file, deleteFile) => {
+		fetch(`/events/${eventId}`, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				title: title,
+				description: description,
+			}),
+		})
+			.then((res) => {
+				if (res.ok) {
+					setTitle(title);
+					setDescription(description);
+					toggleEditEventDialog(false);
+				}
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	};
+
+	const deleteEvent = () => {
+		return;
+	};
 
 	const createPoll = (
 		title,
@@ -94,12 +131,16 @@ function ManageEvent() {
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({
-				title: pollTitle,
+				title,
+				allowCustomAnswers,
+				votesPerParticipant,
+				answers,
 			}),
 		})
 			.then((res) => res.json())
 			.then((res) => {
-				console.log(res);
+				setPolls([...polls, res]);
+				toggleNewPollDialog(false);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -111,7 +152,14 @@ function ManageEvent() {
 			method: "PUT",
 		})
 			.then((res) => {
-				console.log(res);
+				if (res.ok) {
+					setPolls(
+						polls.map((poll) => ({
+							...poll,
+							started: poll._id === pollId ? true : poll.started,
+						}))
+					);
+				}
 			})
 			.catch((err) => {
 				console.log(err);
@@ -123,31 +171,70 @@ function ManageEvent() {
 			method: "PUT",
 		})
 			.then((res) => {
-				console.log(res);
+				if (res.ok) {
+					setPolls(
+						polls.map((poll) => ({
+							...poll,
+							stopped: poll._id === pollId ? true : poll.stopped,
+						}))
+					);
+				}
 			})
 			.catch((err) => {
 				console.log(err);
 			});
 	};
 
-	const deletePoll = (id) => {
-		fetch(`/polls/${id}`, {
+	const deletePoll = (pollId) => {
+		fetch(`/polls/${pollId}`, {
 			method: "DELETE",
 		})
 			.then((res) => {
-				console.log(res);
+				if (res.ok) {
+					setPolls(polls.filter((poll) => poll._id !== pollId));
+				}
 			})
 			.catch((err) => {
 				console.log(err);
 			});
 	};
 
+	const showResults = (pollId) => {
+		setRedirect(`/o/event/${eventId}/poll/${pollId}/results`);
+	};
+
+	if (redirect) {
+		return <Navigate to={redirect} />;
+	}
+
 	return (
 		<React.Fragment>
-			<ShareDialog
+			<EditEventDialog
+				open={openEditEventDialog}
+				handleClose={() => {
+					toggleEditEventDialog(false);
+				}}
+				handleSave={editEvent}
+				handleDelete={() => {
+					toggleDeleteEventDialog(true);
+				}}
+				title={title}
+				description={description}
+				file={file}
+			/>
+
+			<DeleteEventDialog
+				open={openDeleteEventDialog}
+				handleCancel={() => {
+					toggleDeleteEventDialog(false);
+				}}
+				handleConfirm={deleteEvent}
+			/>
+
+			<ShareEventDialog
 				open={openShareDiaglog}
 				handleClose={() => {
-					toggleShareDialog(false);
+					toggleShareEventDialog(false);
 				}}
 				code={eventId}
 				secret={secret}
@@ -156,17 +243,19 @@ function ManageEvent() {
 			<CreatePollDialog
 				open={openNewPollDialog}
 				handleClose={() => toggleNewPollDialog(false)}
+				handleCreate={createPoll}
 			/>
 
 			<Box padding={3}>
 				<Stack spacing={2}>
-					<Typography variant="h4">{title}</Typography>
+					<Typography variant="h4" component="h1">
+						{title}
+					</Typography>
 
 					<List>
 						<ListItem
-							component={Link}
-							to={`/o/event/${eventId}/edit`}
 							button
+							onClick={() => toggleEditEventDialog(true)}
 						>
 							<ListItemIcon>
 								<SettingsIcon />
@@ -183,7 +272,7 @@ function ManageEvent() {
 						</ListItem>
 						<ListItem
 							button
-							onClick={() => toggleShareDialog(true)}
+							onClick={() => toggleShareEventDialog(true)}
 						>
 							<ListItemIcon>
 								<GroupIcon />
@@ -200,7 +289,9 @@ function ManageEvent() {
 						</ListItem>
 					</List>
 
-					<Typography variant="h6">Abstimmungen</Typography>
+					<Typography variant="h6" component="h2">
+						Abstimmungen
+					</Typography>
 
 					{polls.length > 0 ? (
 						<React.Fragment>
@@ -216,7 +307,14 @@ function ManageEvent() {
 									Neue Abstimmung
 								</Button>
 							</Box>
-							<ListPolls polls={polls} eventId={eventId} />
+							<ListPolls
+								polls={polls}
+								eventId={eventId}
+								startPoll={startPoll}
+								stopPoll={stopPoll}
+								deletePoll={deletePoll}
+								showResults={showResults}
+							/>
 						</React.Fragment>
 					) : (
 						<CreatePollFiller

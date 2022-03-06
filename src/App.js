@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import { ThemeProvider, useTheme } from "@mui/material/styles";
-import theme from "./theme";
+import mytheme from "./theme";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import Box from "@mui/material/Box";
@@ -13,15 +13,18 @@ import Drawer from "./layout/Drawer";
 import Footer from "./layout/Footer";
 
 import Home from "./components/Home";
-import EventViewP from "./components/EventViewP";
-import VoteP from "./components/VoteP";
+
+import ManageEvent from "./components/ManageEvent";
+import ViewEvent from "./components/ViewEvent";
+
+import Vote from "./components/Vote";
+
 import ResultsP from "./components/ResultsP";
-import CreateEvent from "./components/ManageEvent";
-import NewPoll from "./components/NewPoll";
-import EditEvent from "./components/EditEventDialog";
 import ResultsO from "./components/ResultsO";
+
 import JoinO from "./components/JoinO";
 import JoinP from "./components/JoinP";
+
 import { io } from "socket.io-client";
 
 function App() {
@@ -33,7 +36,7 @@ function App() {
 	const desktop = useMediaQuery(theme.breakpoints.up("md"));
 
 	return (
-		<ThemeProvider theme={theme}>
+		<ThemeProvider theme={mytheme}>
 			<Router>
 				<Drawer open={open} toggleDrawer={toggleDrawer} />
 				<Box
@@ -83,12 +86,12 @@ function App() {
 								<Route
 									exact
 									path="/p/event/:eventId"
-									element={<EventViewP socket={socket} />}
+									element={<ViewEvent socket={socket} />}
 								/>
 								<Route
 									exact
 									path="/p/event/:eventId/poll/:pollId"
-									element={<VoteP socket={socket} />}
+									element={<Vote socket={socket} />}
 								/>
 								<Route
 									exact
@@ -98,17 +101,7 @@ function App() {
 								<Route
 									exact
 									path="/o/event/:eventId"
-									element={<CreateEvent socket={socket} />}
-								/>
-								<Route
-									exact
-									path="/o/event/:eventId/newPoll/:pollId"
-									element={<NewPoll socket={socket} />}
-								/>
-								<Route
-									exact
-									path="/o/event/:eventId/edit"
-									element={<EditEvent socket={socket} />}
+									element={<ManageEvent socket={socket} />}
 								/>
 								<Route
 									exact
@@ -117,15 +110,15 @@ function App() {
 								/>
 								<Route
 									exact
-									path="/o/event/join/:secretO"
-									element={<JoinO socket={socket} />}
+									path="/c/:eventId"
+									element={<JoinP socket={socket} />}
 								/>
 								<Route
 									exact
-									path="/p/event/join/:eventId"
-									element={<JoinP socket={socket} />}
+									path="/s/:secret"
+									element={<JoinO socket={socket} />}
 								/>
-								<Route path="/" element={<Home />} />
+								<Route exact path="/" element={<Home />} />
 							</Routes>
 						</Box>
 						{desktop ? (

@@ -32,11 +32,11 @@ function JoinO(props) {
 		const requestOptions = {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ secret: params.secretO }),
+			body: JSON.stringify({ secret: params.secret }),
 		};
 
 		fetch(
-			process.env.REACT_APP_API_URL + `/events/${params.secretO}/edit`,
+			process.env.REACT_APP_API_URL + `/events/${params.secret}/edit`,
 			requestOptions
 		)
 			.then((response) => response.json())
