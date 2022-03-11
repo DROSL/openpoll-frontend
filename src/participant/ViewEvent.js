@@ -4,10 +4,7 @@ import { Navigate, useParams } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
-import AttachFileIcon from "@mui/icons-material/AttachFile";
-import DownloadIcon from "@mui/icons-material/Download";
 
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
@@ -15,10 +12,9 @@ import DialogTitle from "@mui/material/DialogTitle";
 
 import ListPolls from "./ListPollsP";
 
-import spooky from "./spooky.svg";
+import spooky from "../images/spooky.svg";
 
 import { io } from "socket.io-client";
-import { PollSharp } from "@mui/icons-material";
 
 function ViewEvent(props) {
 	const { eventId } = useParams();
@@ -94,8 +90,6 @@ function ViewEvent(props) {
 			toggleDialog(true);
 		});
 	};
-
-	let params = useParams();
 
 	if (redirect) {
 		return <Navigate to={redirect} />;

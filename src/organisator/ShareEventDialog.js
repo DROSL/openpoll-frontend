@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 import Slide from "@mui/material/Slide";
 
@@ -34,7 +33,7 @@ function ShareEventDialog(props) {
 	const { open, handleClose, code, secret } = props;
 
 	const [tab, setTab] = useState(0);
-	const [showLink, setShowLink] = useState(false);
+	const [showLink, setShowLink] = useState(true);
 
 	const handleTabChange = (event, newValue) => {
 		setTab(newValue);
@@ -54,7 +53,7 @@ function ShareEventDialog(props) {
 					<Tab label="Teilnehmer" />
 					<Tab label="Organisatoren" />
 				</Tabs>
-				{tab == 0 && (
+				{tab === 0 && (
 					<Box mt={2}>
 						<Stack>
 							<FormControl>
@@ -110,7 +109,8 @@ function ShareEventDialog(props) {
 						</Stack>
 					</Box>
 				)}
-				{tab == 1 && (
+
+				{tab === 1 && (
 					<Stack mt={2} spacing={2}>
 						<Alert severity="warning">
 							<AlertTitle>Achtung</AlertTitle>

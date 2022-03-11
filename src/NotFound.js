@@ -1,49 +1,48 @@
+import { Link } from "react-router-dom";
+
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
 
-import spooky from "./spooky.svg";
+import image from "./images/bear.svg";
 
-function CreatePollFiller(props) {
-	const { handleClick } = props;
-
+function NotFound() {
 	return (
 		<Box
 			sx={{
 				width: "100%",
+				height: "100%",
 				display: "flex",
 				alignItems: "center",
 				justifyContent: "center",
+				p: 3,
+				boxSizing: "border-box",
 			}}
 		>
 			<Stack direction="column" alignItems="center">
-				<img
-					src={spooky}
-					alt="Noch keine Abstimmungen erstellt"
-					width="150px"
-				/>
+				<img src={image} alt="Seite nicht gefunden" width="150px" />
 				<Typography sx={{ mt: 2, fontWeight: "bold" }}>
-					Ziemlich leer hier
+					Seite nicht gefunden
 				</Typography>
 				<Typography align="center">
-					Beginnen Sie, indem Sie Ihre erste Abstimmung erstellen!
+					Das hat nicht geklappt. Die angeforderte Seite existiert
+					nicht.
 				</Typography>
 				<Button
+					LinkComponent={Link}
+					to="/"
 					size="large"
 					variant="contained"
 					color="primary"
 					disableElevation
-					startIcon={<AddIcon />}
-					onClick={handleClick}
 					sx={{ mt: 2 }}
 				>
-					Neue Abstimmung
+					Zur Startseite
 				</Button>
 			</Stack>
 		</Box>
 	);
 }
 
-export default CreatePollFiller;
+export default NotFound;

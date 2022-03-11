@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Navigate, Link, useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -48,7 +48,6 @@ function ManageEvent() {
 	const [joinable, setJoinable] = useState(true);
 
 	const [polls, setPolls] = useState([]);
-	const [pollTitle, setPollTitle] = useState(null);
 
 	const [openEditEventDialog, toggleEditEventDialog] = useState(false);
 	const [openDeleteEventDialog, toggleDeleteEventDialog] = useState(false);
@@ -123,7 +122,8 @@ function ManageEvent() {
 		title,
 		answers,
 		allowCustomAnswers,
-		votesPerParticipant
+		votesPerParticipant,
+		allowMultipleVotesPerAnswer
 	) => {
 		fetch(`/events/${eventId}/polls`, {
 			method: "POST",
@@ -132,9 +132,10 @@ function ManageEvent() {
 			},
 			body: JSON.stringify({
 				title,
+				answers,
 				allowCustomAnswers,
 				votesPerParticipant,
-				answers,
+				allowMultipleVotesPerAnswer,
 			}),
 		})
 			.then((res) => res.json())
@@ -246,7 +247,7 @@ function ManageEvent() {
 				handleCreate={createPoll}
 			/>
 
-			<Box padding={3}>
+			<Box p={3}>
 				<Stack spacing={2}>
 					<Typography variant="h4" component="h1">
 						{title}

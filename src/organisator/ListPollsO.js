@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 
 import List from "@mui/material/List";
 import ListSubheader from "@mui/material/ListSubheader";
 import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import IconButton from "@mui/material/IconButton";
 
@@ -26,7 +23,6 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 function ListPolls(props) {
 	const {
-		eventId,
 		polls,
 		startPoll,
 		stopPoll,
@@ -172,7 +168,7 @@ function ListPolls(props) {
 								secondary="4 Antwortmöglichkeiten"
 							/>
 							<Stack direction="row" spacing={1}>
-								{desktop && activePolls.length == 0 && (
+								{desktop && activePolls.length === 0 && (
 									<Button
 										disableElevation
 										variant="contained"

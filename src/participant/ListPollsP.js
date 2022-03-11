@@ -1,29 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
 
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
-
 import List from "@mui/material/List";
 import ListSubheader from "@mui/material/ListSubheader";
 import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import IconButton from "@mui/material/IconButton";
+
+import Button from "@mui/material/Button";
 
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import SettingsBackupRestoreIcon from "@mui/icons-material/SettingsBackupRestore";
-import DeleteIcon from "@mui/icons-material/Delete";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 function ListPolls(props) {
-	const { eventId, polls, startVoting, showResults } = props;
+	const { polls, startVoting, showResults } = props;
 
 	const activePolls = polls.filter((poll) => poll.started && !poll.stopped);
 	const finishedPolls = polls.filter((poll) => poll.started && poll.stopped);

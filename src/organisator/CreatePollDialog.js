@@ -6,7 +6,6 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 
 import AppBar from "@mui/material/AppBar";
@@ -46,24 +45,38 @@ function CreatePollDialog(props) {
 
 	const [title, setTitle] = useState("");
 	const [answers, setAnswers] = useState([""]);
-	const [checked, setChecked] = useState(false);
-	const [count, setCount] = useState(1);
+	const [allowCustomAnswers, setAllowCustomAnswers] = useState(false);
+	const [votesPerParticipant, setVotesPerParticipant] = useState(1);
+	const [allowMultipleVotesPerAnswer, setAllowMultipleVotesPerAnswer] =
+		useState(false);
 
 	useEffect(() => {
 		setTitle("");
 		setAnswers([""]);
-		setChecked(false);
-		setCount(1);
+		setAllowCustomAnswers(false);
+		setVotesPerParticipant(1);
 	}, [open]);
 
 	const createCreateHandler = () => {
-		handleCreate(title, answers, checked, count);
+		handleCreate(
+			title,
+			answers,
+			allowCustomAnswers,
+			votesPerParticipant,
+			allowMultipleVotesPerAnswer
+		);
 	};
 
 	const handleChange = (event) => {
 		// TODO: positive integer verification
-		setCount(event.target.value);
+		setVotesPerParticipant(event.target.value);
 	};
+
+	useEffect(() => {
+		if (votesPerParticipant <= 1) {
+			setAllowMultipleVotesPerAnswer(false);
+		}
+	}, [votesPerParticipant]);
 
 	return (
 		<Dialog
@@ -104,6 +117,7 @@ function CreatePollDialog(props) {
 					</Toolbar>
 				</AppBar>
 			)}
+
 			<DialogContent>
 				<TextField
 					autoFocus
@@ -177,13 +191,27 @@ function CreatePollDialog(props) {
 					<FormControlLabel
 						control={
 							<Checkbox
-								value={checked}
+								checked={allowCustomAnswers}
 								onChange={(e) => {
-									setChecked(e.target.checked);
+									setAllowCustomAnswers(e.target.checked);
 								}}
 							/>
 						}
 						label="Teilnehmer dürfen eigene Antworten hinzufügen"
+					/>
+					<FormControlLabel
+						control={
+							<Checkbox
+								disabled={votesPerParticipant <= 1}
+								checked={allowMultipleVotesPerAnswer}
+								onChange={(e) => {
+									setAllowMultipleVotesPerAnswer(
+										e.target.checked
+									);
+								}}
+							/>
+						}
+						label="Mehrere Stimmen pro Antwort erlauben"
 					/>
 				</FormGroup>
 
@@ -193,11 +221,11 @@ function CreatePollDialog(props) {
 						type="number"
 						inputProps={{ min: 1 }}
 						sx={{ width: 50 }}
-						value={count}
+						value={votesPerParticipant}
 						onChange={handleChange}
 					/>
 					<Typography sx={{ ml: 1 }}>
-						{count > 1
+						{votesPerParticipant > 1
 							? " Stimmen pro Teilnehmer"
 							: " Stimme pro Teilnehmer"}
 					</Typography>

@@ -4,16 +4,13 @@ import { Navigate, useParams } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import {
-	DialogActions,
-	DialogContentText,
-	TextField,
-	Typography,
-} from "@mui/material";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 
 import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
 
 import AddIcon from "@mui/icons-material/Add";
 
@@ -34,10 +31,23 @@ function Vote(props) {
 	const [allowCustomAnswers, setAllowCustomAnswers] = useState(false);
 
 	const [totalVotes, setTotalVotes] = useState(0);
-	const [votes, setVotes] = useState(0);
+	const [votes, setVotes] = useState([]);
 	const remainingVotes = totalVotes - votes.length;
 
 	const [open, toggleDialog] = useState(false);
+	const [customAnswer, setCustomAnswer] = useState("");
+
+	const handleClose = () => {
+		toggleDialog(false);
+	};
+
+	const handleChange = (event) => {
+		setCustomAnswer(event.target.value);
+	};
+
+	useEffect(() => {
+		setCustomAnswer("");
+	}, [open]);
 
 	const getPoll = () => {
 		fetch(`/polls/${pollId}`, {
@@ -105,20 +115,28 @@ function Vote(props) {
 			});
 	};
 
-	const handleResults = () => {
-		if (votes > 0) {
-			toggleDialog(true);
-		} else {
-			//setRedirect(`/p/event/${eventId}/poll/${pollId}/results`);
-		}
-	};
-
-	const handleProceedResults = () => {
-		//setRedirect(`/p/event/${eventId}/poll/${pollId}/results`);
+	const createAnswer = () => {
+		fetch(`/polls/${pollId}/answers`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				title: customAnswer,
+			}),
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				setAnswers([...answers, data]);
+				toggleDialog(false);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	};
 
 	useEffect(() => {
-		if (remainingVotes == 0 && !loading) {
+		if (remainingVotes === 0 && !loading) {
 			setRedirect(`/p/event/${eventId}/poll/${pollId}/results`);
 		}
 	}, [remainingVotes, loading]);
@@ -129,108 +147,111 @@ function Vote(props) {
 
 	return (
 		<React.Fragment>
-			<Dialog
-				open={open}
-				onClose={() => {
-					toggleDialog(false);
-				}}
-				fullWidth
-				maxWidth="xs"
-			>
+			<Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
 				<DialogTitle>Eigene Antwort</DialogTitle>
 				<DialogContent>
-					<TextField fullWidth variant="standard" label="Antwort" />
+					<TextField
+						fullWidth
+						variant="standard"
+						label="Antwort"
+						value={customAnswer}
+						onChange={handleChange}
+					/>
 					<Typography variant="caption">
 						Ihre Antwort wird den anderen Teilnehmern als weitere
 						Antwortmöglichkeit angezeigt.
 					</Typography>
 				</DialogContent>
 				<DialogActions>
-					<Button
-						onClick={() => {
-							toggleDialog(false);
-						}}
-					>
-						Abbrechen
-					</Button>
-					<Button
-						onClick={() => {
-							toggleDialog(false);
-						}}
-					>
-						Abstimmen
-					</Button>
+					<Button onClick={handleClose}>Abbrechen</Button>
+					<Button onClick={createAnswer}>Abstimmen</Button>
 				</DialogActions>
 			</Dialog>
 
-			<Box
-				sx={{
-					width: "100%",
-					height: 300,
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
-					p: 3,
-					boxSizing: "border-box",
-				}}
-			>
-				<Stack direction="column" alignItems="center" spacing={2}>
-					<Typography variant="h4" component="h1">
-						{title}
-					</Typography>
-					<Typography>
-						{remainingVotes === 1
-							? "1 Stimme verbleibend"
-							: `${remainingVotes} Stimmen verbleibend`}
-					</Typography>
-				</Stack>
-			</Box>
-
-			<Box sx={{ width: "100%", pl: 3, pr: 3, boxSizing: "border-box" }}>
-				<Stack
+			<Box p={3}>
+				<Box
 					sx={(theme) => ({
 						width: "100%",
 						maxWidth: theme.breakpoints.values.sm,
-						margin: "0 auto",
+						margin: "auto",
 					})}
-					spacing={1}
 				>
-					{answers.map((answer, index) => {
-						return (
+					<Box
+						sx={{
+							width: "100%",
+							minHeight: 200,
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
+							boxSizing: "border-box",
+						}}
+					>
+						<Stack
+							direction="column"
+							alignItems="center"
+							spacing={2}
+						>
+							<Typography
+								variant="h4"
+								component="h1"
+								align="center"
+							>
+								{title}
+							</Typography>
+							<Typography>
+								{remainingVotes === 1
+									? "1 Stimme verbleibend"
+									: `${remainingVotes} Stimmen verbleibend`}
+							</Typography>
+						</Stack>
+					</Box>
+					<Stack spacing={1} sx={{ mt: 3 }}>
+						{answers.map((answer, index) => {
+							const count = votes.filter(
+								(vote) => vote.answer === answer._id
+							).length;
+							const disabled =
+								processing ||
+								(count > 0 && !allowMultipleVotesPerAnswer);
+
+							return (
+								<Button
+									fullWidth
+									disableElevation
+									size="large"
+									variant="contained"
+									key={`vote-${answer._id}`}
+									onClick={() => handleVote(answer._id)}
+									disabled={disabled}
+									sx={{
+										backgroundColor:
+											ANSWER_COLORS[
+												index % ANSWER_COLORS.length
+											],
+									}}
+								>
+									{count > 0 && allowMultipleVotesPerAnswer
+										? `${answer.title} (${count})`
+										: answer.title}
+								</Button>
+							);
+						})}
+						{allowCustomAnswers && (
 							<Button
-								key={`vote-${answer._id}`}
 								fullWidth
 								disableElevation
-								size="large"
 								variant="contained"
-								sx={{
-									backgroundColor:
-										ANSWER_COLORS[
-											index % ANSWER_COLORS.length
-										],
+								color="inherit"
+								startIcon={<AddIcon />}
+								onClick={() => {
+									toggleDialog(true);
 								}}
-								disabled={processing}
-								onClick={() => handleVote(answer._id)}
 							>
-								{answer.title}
+								Eigene Antwort
 							</Button>
-						);
-					})}
-					{allowCustomAnswers && (
-						<Button
-							fullWidth
-							disableElevation
-							variant="contained"
-							color="inherit"
-							startIcon={<AddIcon />}
-							onClick={() => {
-								toggleDialog(true);
-							}}
-						>
-							Eigene Antwort
-						</Button>
-					)}
-				</Stack>
+						)}
+					</Stack>
+				</Box>
 			</Box>
 		</React.Fragment>
 	);

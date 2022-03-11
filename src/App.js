@@ -12,18 +12,20 @@ import AppBar from "./layout/AppBar";
 import Drawer from "./layout/Drawer";
 import Footer from "./layout/Footer";
 
-import Home from "./components/Home";
+import Home from "./Home";
 
-import ManageEvent from "./components/ManageEvent";
-import ViewEvent from "./components/ViewEvent";
+import ManageEvent from "./organisator/ManageEvent";
+import ViewEvent from "./participant/ViewEvent";
 
-import Vote from "./components/Vote";
+import JoinOrganisator from "./organisator/JoinO";
+import JoinParticipant from "./participant/JoinP";
 
-import ResultsP from "./components/ResultsP";
-import ResultsO from "./components/ResultsO";
+import Vote from "./participant/Vote";
 
-import JoinO from "./components/JoinO";
-import JoinP from "./components/JoinP";
+import ResultsOrganisator from "./organisator/ResultsO";
+import ResultsParticipant from "./participant/ResultsP";
+
+import NotFound from "./NotFound";
 
 import { io } from "socket.io-client";
 
@@ -85,6 +87,11 @@ function App() {
 							<Routes>
 								<Route
 									exact
+									path="/o/event/:eventId"
+									element={<ManageEvent socket={socket} />}
+								/>
+								<Route
+									exact
 									path="/p/event/:eventId"
 									element={<ViewEvent socket={socket} />}
 								/>
@@ -95,30 +102,34 @@ function App() {
 								/>
 								<Route
 									exact
-									path="/p/event/:eventId/poll/:pollId/results"
-									element={<ResultsP socket={socket} />}
-								/>
-								<Route
-									exact
-									path="/o/event/:eventId"
-									element={<ManageEvent socket={socket} />}
-								/>
-								<Route
-									exact
 									path="/o/event/:eventId/poll/:pollId/results"
-									element={<ResultsO socket={socket} />}
+									element={
+										<ResultsOrganisator socket={socket} />
+									}
+								/>
+								<Route
+									exact
+									path="/p/event/:eventId/poll/:pollId/results"
+									element={
+										<ResultsParticipant socket={socket} />
+									}
 								/>
 								<Route
 									exact
 									path="/c/:eventId"
-									element={<JoinP socket={socket} />}
+									element={
+										<JoinParticipant socket={socket} />
+									}
 								/>
 								<Route
 									exact
 									path="/s/:secret"
-									element={<JoinO socket={socket} />}
+									element={
+										<JoinOrganisator socket={socket} />
+									}
 								/>
 								<Route exact path="/" element={<Home />} />
+								<Route path="*" exact element={<NotFound />} />
 							</Routes>
 						</Box>
 						{desktop ? (

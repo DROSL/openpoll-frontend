@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -7,7 +6,6 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 
 import AppBar from "@mui/material/AppBar";
@@ -20,7 +18,6 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import IconButton from "@mui/material/IconButton";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
@@ -31,8 +28,6 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 function EditEventDialog(props) {
-	const { eventId } = useParams();
-
 	const {
 		open,
 		handleClose,
@@ -69,22 +64,6 @@ function EditEventDialog(props) {
 
 	const changeHandler = (event) => {
 		setLocalFile(event.target.files[0]);
-	};
-
-	const handleSubmission = (file) => {
-		const formData = new FormData();
-
-		formData.append("file", file);
-
-		fetch(`/events/${eventId}/file`, {
-			method: "POST",
-			headers: { "Content-Type": "application/pdf" },
-			body: formData,
-		})
-			.then((res) => console.log(res))
-			.catch((err) => {
-				console.log(err);
-			});
 	};
 
 	return (
