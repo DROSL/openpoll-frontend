@@ -83,11 +83,11 @@ function ListPolls(props) {
 						</ListSubheader>
 					}
 				>
-					{activePolls.map((poll) => (
-						<ListItem>
+					{activePolls.map((poll, index) => (
+						<ListItem key={`poll-active-${index}`}>
 							<ListItemText
 								primary={poll.title}
-								secondary="03:54 verbleibend"
+								secondary="4 Antwortmöglichkeiten"
 							/>
 							<Stack direction="row" spacing={1}>
 								{desktop && (
@@ -161,8 +161,8 @@ function ListPolls(props) {
 						</ListSubheader>
 					}
 				>
-					{savedPolls.map((poll) => (
-						<ListItem>
+					{savedPolls.map((poll, index) => (
+						<ListItem key={`poll-saved-${index}`}>
 							<ListItemText
 								primary={poll.title}
 								secondary="4 Antwortmöglichkeiten"
@@ -238,11 +238,11 @@ function ListPolls(props) {
 						</ListSubheader>
 					}
 				>
-					{finishedPolls.map((poll) => (
-						<ListItem>
+					{finishedPolls.map((poll, index) => (
+						<ListItem key={`poll-finished-${index}`}>
 							<ListItemText
 								primary={poll.title}
-								secondary="153 Abstimmungen"
+								secondary="4 Antwortmöglichkeiten"
 							/>
 							<IconButton onClick={createClickHandler3(poll._id)}>
 								<MoreVertIcon />

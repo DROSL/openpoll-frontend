@@ -17,21 +17,22 @@ import Home from "./Home";
 import ManageEvent from "./organisator/ManageEvent";
 import ViewEvent from "./participant/ViewEvent";
 
-import JoinOrganisator from "./organisator/JoinO";
-import JoinParticipant from "./participant/JoinP";
+import JoinOrganisator from "./organisator/Join";
+import JoinParticipant from "./participant/Join";
 
 import Vote from "./participant/Vote";
 
-import ResultsOrganisator from "./organisator/ResultsO";
-import ResultsParticipant from "./participant/ResultsP";
+import ResultsOrganisator from "./organisator/Results";
+import ResultsParticipant from "./participant/Results";
+
+import Impressum from "./sites/Impressum";
 
 import NotFound from "./NotFound";
 
 import { io } from "socket.io-client";
+const socket = io();
 
 function App() {
-	const socket = io();
-
 	const [open, toggleDrawer] = useState(false);
 
 	const theme = useTheme();
@@ -128,8 +129,13 @@ function App() {
 										<JoinOrganisator socket={socket} />
 									}
 								/>
+								<Route
+									exact
+									path="/impressum"
+									element={<Impressum />}
+								/>
 								<Route exact path="/" element={<Home />} />
-								<Route path="*" exact element={<NotFound />} />
+								<Route exact path="*" element={<NotFound />} />
 							</Routes>
 						</Box>
 						{desktop ? (

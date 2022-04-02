@@ -32,8 +32,9 @@ function ListPolls(props) {
 						</ListSubheader>
 					}
 				>
-					{activePolls.map((poll) => (
+					{activePolls.map((poll, index) => (
 						<ListItem
+							key={`poll-active-${index}`}
 							{...(!desktop && {
 								button: true,
 								onClick: () => {
@@ -43,7 +44,7 @@ function ListPolls(props) {
 						>
 							<ListItemText
 								primary={poll.title}
-								secondary="03:54 verbleibend"
+								secondary="4 Antwortmöglichkeiten"
 							/>
 							{desktop && (
 								<Button
@@ -70,18 +71,19 @@ function ListPolls(props) {
 						</ListSubheader>
 					}
 				>
-					{finishedPolls.map((poll) => (
+					{finishedPolls.map((poll, index) => (
 						<ListItem
+							key={`poll-finished-${index}`}
 							{...(!desktop && {
 								button: true,
 								onClick: () => {
-									startVoting(poll._id);
+									showResults(poll._id);
 								},
 							})}
 						>
 							<ListItemText
 								primary={poll.title}
-								secondary="153 Abstimmungen"
+								secondary="4 Antwortmöglichkeiten"
 							/>
 							{desktop && (
 								<Button

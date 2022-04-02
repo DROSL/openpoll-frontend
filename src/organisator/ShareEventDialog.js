@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
+
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
+
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
 import Slide from "@mui/material/Slide";
 
 import Tabs from "@mui/material/Tabs";
@@ -11,6 +17,7 @@ import Tab from "@mui/material/Tab";
 
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 
@@ -24,13 +31,18 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import CloseIcon from "@mui/icons-material/Close";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
 	return <Slide direction="up" ref={ref} {...props} />;
 });
 
 function ShareEventDialog(props) {
-	const { open, handleClose, code, secret } = props;
+	const { open, handleClose, code, secret, joinable, handleChangeJoinable } =
+		props;
+
+	const theme = useTheme();
+	const desktop = useMediaQuery(theme.breakpoints.up("md"));
 
 	const [tab, setTab] = useState(0);
 	const [showLink, setShowLink] = useState(true);
@@ -45,11 +57,38 @@ function ShareEventDialog(props) {
 			onClose={handleClose}
 			fullWidth
 			maxWidth="sm"
+			fullScreen={!desktop}
 			TransitionComponent={Transition}
 		>
-			<DialogTitle>Veranstaltung teilen</DialogTitle>
+			{desktop ? (
+				<DialogTitle>Veranstaltung teilen</DialogTitle>
+			) : (
+				<AppBar position="static">
+					<Toolbar>
+						<IconButton
+							edge="start"
+							color="inherit"
+							onClick={handleClose}
+							aria-label="close"
+						>
+							<CloseIcon />
+						</IconButton>
+						<Typography
+							sx={{ ml: 2, flex: 1 }}
+							variant="h6"
+							component="div"
+						>
+							Veranstaltung teilen
+						</Typography>
+					</Toolbar>
+				</AppBar>
+			)}
 			<DialogContent>
-				<Tabs value={tab} onChange={handleTabChange}>
+				<Tabs
+					variant={desktop ? "standard" : "fullWidth"}
+					value={tab}
+					onChange={handleTabChange}
+				>
 					<Tab label="Teilnehmer" />
 					<Tab label="Organisatoren" />
 				</Tabs>
@@ -60,9 +99,11 @@ function ShareEventDialog(props) {
 								<FormControlLabel
 									control={
 										<Switch
-											checked={true}
+											checked={joinable}
 											onChange={(e) => {
-												//setJoinable(e.target.checked);
+												handleChangeJoinable(
+													e.target.checked
+												);
 											}}
 										/>
 									}
@@ -139,9 +180,11 @@ function ShareEventDialog(props) {
 					</Stack>
 				)}
 			</DialogContent>
-			<DialogActions>
-				<Button onClick={handleClose}>Schließen</Button>
-			</DialogActions>
+			{desktop && (
+				<DialogActions>
+					<Button onClick={handleClose}>Schließen</Button>
+				</DialogActions>
+			)}
 		</Dialog>
 	);
 }

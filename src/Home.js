@@ -34,7 +34,7 @@ function Home() {
 		if (code) {
 			setLoading(true);
 
-			fetch(`/events/${this.state.eventCode}/join`, {
+			fetch(`/events/${code}/join`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -44,6 +44,8 @@ function Home() {
 				.then((res) => {
 					if (res.ok) {
 						setRedirect(`/p/event/${code}`);
+					} else {
+						throw "Not ok";
 					}
 				})
 				.catch((err) => {
@@ -74,11 +76,11 @@ function Home() {
 			});
 	};
 
-	const handleKeyDown = (event) => {
+	const createEnterHandler = (handler) => (event) => {
 		setError(false);
 
-		if (event.key === "Enter") {
-			handleClickJoin();
+		if (event.keyCode === 13) {
+			handler();
 		}
 	};
 
@@ -109,21 +111,18 @@ function Home() {
 			>
 				{view === "join" && (
 					<React.Fragment>
-						{error ? (
-							<Alert severity="error">
-								Konnte der Veranstaltung nicht beitreten
-							</Alert>
-						) : null}
-
 						<TextField
 							fullWidth
 							autoFocus
-							color={error ? "error" : "primary"}
 							variant="outlined"
 							label="Code"
-							onKeyDown={handleKeyDown}
+							{...(error && {
+								error: true,
+								helperText: "Ungültiger Code",
+							})}
 							value={code}
 							onChange={createChangeHandler(setCode)}
+							onKeyDown={createEnterHandler(handleClickJoin)}
 						/>
 						<Button
 							fullWidth
@@ -166,6 +165,7 @@ function Home() {
 							label="Titel"
 							value={title}
 							onChange={createChangeHandler(setTitle)}
+							onKeyDown={createEnterHandler(handleClickCreate)}
 						/>
 						<Button
 							fullWidth

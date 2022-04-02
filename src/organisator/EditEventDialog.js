@@ -174,6 +174,7 @@ function EditEventDialog(props) {
 							</Box>
 						) : (
 							<Button
+								disabled
 								disableElevation
 								variant="contained"
 								startIcon={<AttachFileIcon />}

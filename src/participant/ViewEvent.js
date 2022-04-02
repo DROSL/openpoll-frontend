@@ -10,13 +10,13 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 
-import ListPolls from "./ListPollsP";
+import ListPolls from "./ListPolls";
+import NotFound from "../NotFound";
 
 import spooky from "../images/spooky.svg";
 
-import { io } from "socket.io-client";
-
 function ViewEvent(props) {
+	const { socket } = props;
 	const { eventId } = useParams();
 
 	const [redirect, setRedirect] = useState(null);
@@ -28,10 +28,9 @@ function ViewEvent(props) {
 	const [polls, setPolls] = useState([]);
 
 	const [open, toggleDialog] = useState(false);
+	const [activePoll, setActivePoll] = useState({});
 
-	const [pollTitle, setPollTitle] = useState(null);
-	const [pollId, setPollId] = useState(null);
-	const [pollActive, setPollActive] = useState(false);
+	const [errorEventNotFound, setErrorEventNotFound] = useState(false);
 
 	const getEvent = () => {
 		fetch(`/events/${eventId}`, {
@@ -43,7 +42,10 @@ function ViewEvent(props) {
 				setDescription(res.description);
 				setFile(res.file);
 			})
-			.catch((error) => console.log(error));
+			.catch((err) => {
+				console.log(err);
+				setErrorEventNotFound(true);
+			});
 	};
 
 	const getPolls = () => {
@@ -62,58 +64,71 @@ function ViewEvent(props) {
 	useEffect(() => {
 		getEvent();
 		getPolls();
-		socketListeners();
-	}, []);
 
-	const handleClickVote = (pollId) => {
-		toggleDialog(false);
-
-		setRedirect(`/p/event/${eventId}/poll/${pollId}`);
-	};
-
-	const handleClickResults = (pollsId) => {
-		setRedirect(`/p/event/${eventId}/poll/${pollId}/results`);
-	};
-
-	const socketListeners = () => {
-		console.log("Listening");
-		const socket = io();
 		socket.on("event-delete", (code) => {
 			console.log("EVENT DELETED");
 			setRedirect("/");
 		});
 
-		socket.on("poll-start", (code, poll_id, poll_title) => {
-			setPollTitle(poll_title);
-			setPollId(poll_id);
-			setPollActive(true);
+		socket.on("poll-start", (code, pollId, pollTitle) => {
+			getPolls();
+			setActivePoll({
+				_id: pollId,
+				title: pollTitle,
+				code: code,
+			});
 			toggleDialog(true);
 		});
+
+		socket.on("poll-stop", (code, pollId) => {
+			toggleDialog(false);
+			setActivePoll({});
+			setPolls(
+				polls.map((poll) => ({
+					...poll,
+					...(poll._id === pollId && { stopped: true }),
+				}))
+			);
+		});
+
+		return () => {};
+	}, []);
+
+	const handleClickVote = (pollId) => {
+		setRedirect(`/p/event/${eventId}/poll/${pollId}`);
+	};
+
+	const handleClickResults = (pollId) => {
+		setRedirect(`/p/event/${eventId}/poll/${pollId}/results`);
+	};
+
+	const handleClose = () => {
+		setActivePoll({});
+		toggleDialog(false);
 	};
 
 	if (redirect) {
 		return <Navigate to={redirect} />;
 	}
 
+	if (errorEventNotFound) {
+		return <NotFound />;
+	}
+
 	return (
 		<React.Fragment>
-			<Dialog
-				open={open}
-				onClose={() => {
-					toggleDialog(false);
-				}}
-			>
+			<Dialog open={open} onClose={handleClose}>
 				<DialogTitle>Eine neue Abstimmung ist aktiv!</DialogTitle>
 				<DialogContent>
 					<Stack direction="column" spacing={2}>
-						<Typography>{pollTitle}</Typography>
+						<Typography>{activePoll.title}</Typography>
 						<Button
 							autoFocus
 							disableElevation
 							size="large"
 							variant="contained"
 							onClick={() => {
-								toggleDialog(false);
+								handleClickVote(activePoll._id);
 							}}
 						>
 							Teilnehmen
@@ -123,9 +138,7 @@ function ViewEvent(props) {
 							size="large"
 							variant="contained"
 							color="inherit"
-							onClick={() => {
-								toggleDialog(false);
-							}}
+							onClick={handleClose}
 						>
 							Ignorieren
 						</Button>

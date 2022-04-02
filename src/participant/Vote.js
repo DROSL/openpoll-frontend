@@ -14,9 +14,13 @@ import DialogActions from "@mui/material/DialogActions";
 
 import AddIcon from "@mui/icons-material/Add";
 
+import VoteFinish from "../filler/VoteFinish";
+import PollStopped from "../filler/PollStopped";
+
 const ANSWER_COLORS = ["#32a852", "#4287f5", "#fcba03", "#db4437"];
 
 function Vote(props) {
+	const { socket } = props;
 	const { eventId, pollId } = useParams();
 
 	const [redirect, setRedirect] = useState(null);
@@ -24,6 +28,10 @@ function Vote(props) {
 	const [processing, setProcessing] = useState(false);
 
 	const [title, setTitle] = useState("");
+	const [stopped, setStopped] = useState(false);
+	const setStoppedTrue = () => {
+		setStopped(true);
+	};
 	const [answers, setAnswers] = useState([]);
 
 	const [allowMultipleVotesPerAnswer, setAllowMultipleVotesPerAnswer] =
@@ -33,6 +41,7 @@ function Vote(props) {
 	const [totalVotes, setTotalVotes] = useState(0);
 	const [votes, setVotes] = useState([]);
 	const remainingVotes = totalVotes - votes.length;
+	const finished = !loading && remainingVotes === 0;
 
 	const [open, toggleDialog] = useState(false);
 	const [customAnswer, setCustomAnswer] = useState("");
@@ -54,13 +63,14 @@ function Vote(props) {
 			method: "GET",
 		})
 			.then((res) => res.json())
-			.then((data) => {
-				setTitle(data.title);
-				setTotalVotes(data.votesPerParticipant);
+			.then((poll) => {
+				setTitle(poll.title);
+				setStopped(poll.stopped);
+				setTotalVotes(poll.votesPerParticipant);
 				setAllowMultipleVotesPerAnswer(
-					data.allowMultipleVotesPerAnswer
+					poll.allowMultipleVotesPerAnswer
 				);
-				setAllowCustomAnswers(data.allowCustomAnswers);
+				setAllowCustomAnswers(poll.allowCustomAnswers);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -98,6 +108,14 @@ function Vote(props) {
 		getPoll();
 		getAnswers();
 		getVotes();
+
+		socket.on("poll-stop", setStoppedTrue);
+		socket.on("answer-add", getAnswers);
+
+		return () => {
+			socket.off("poll-stop", setStoppedTrue);
+			socket.off("answer-add", getAnswers);
+		};
 	}, []);
 
 	const handleVote = (answerId) => {
@@ -126,8 +144,9 @@ function Vote(props) {
 			}),
 		})
 			.then((res) => res.json())
-			.then((data) => {
-				setAnswers([...answers, data]);
+			.then((answer) => {
+				setAnswers([...answers, answer]);
+				handleVote(answer._id);
 				toggleDialog(false);
 			})
 			.catch((err) => {
@@ -135,14 +154,34 @@ function Vote(props) {
 			});
 	};
 
-	useEffect(() => {
-		if (remainingVotes === 0 && !loading) {
-			setRedirect(`/p/event/${eventId}/poll/${pollId}/results`);
-		}
-	}, [remainingVotes, loading]);
+	const redirectToEvent = () => {
+		setRedirect(`/p/event/${eventId}`);
+	};
+
+	const redirectToResults = () => {
+		setRedirect(`/p/event/${eventId}/poll/${pollId}/results`);
+	};
 
 	if (redirect) {
 		return <Navigate to={redirect} />;
+	}
+
+	if (stopped) {
+		return (
+			<PollStopped
+				handleBack={redirectToEvent}
+				handleResults={redirectToResults}
+			/>
+		);
+	}
+
+	if (finished) {
+		return (
+			<VoteFinish
+				handleBack={redirectToEvent}
+				handleResults={redirectToResults}
+			/>
+		);
 	}
 
 	return (

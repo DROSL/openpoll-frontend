@@ -8,12 +8,29 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 
+const links = [
+	{
+		name: "Impressum",
+		url: "/impressum",
+	},
+	{
+		name: "Datenschutzerklärung",
+		url: "/datenschutzerklaerung",
+	},
+	{
+		name: "Nutzungsbedingungen",
+		url: "/nutzungsbedingungen",
+	},
+];
+
 function Drawer(props) {
 	const { open, toggleDrawer } = props;
-	const closeDrawer = () => toggleDrawer(false);
+	const handleClose = () => {
+		toggleDrawer(false);
+	};
 
 	return (
-		<MuiDrawer anchor="left" open={open} onClose={closeDrawer}>
+		<MuiDrawer anchor="left" open={open} onClose={handleClose}>
 			<Box sx={{ width: 250 }}>
 				<List>
 					<ListItem>
@@ -25,23 +42,26 @@ function Drawer(props) {
 				</List>
 				<Divider />
 				<List>
-					<ListItem component={Link} to="/impressum" button>
-						<ListItemText primary={"Impressum"} />
-					</ListItem>
-					<ListItem
-						component={Link}
-						to="/datenschutzerklaerung"
-						button
-					>
-						<ListItemText primary={"Datenschutzerklärung"} />
-					</ListItem>
-					<ListItem component={Link} to="/nutzungsbedingungen" button>
-						<ListItemText primary={"Nutzungsbedingungen"} />
-					</ListItem>
+					{links.map((link, index) => (
+						<ListItem
+							key={`drawer-${index}`}
+							component={Link}
+							to={link.url}
+							button
+							onClick={handleClose}
+						>
+							<ListItemText primary={link.name} />
+						</ListItem>
+					))}
 				</List>
 				<Divider />
 				<List>
-					<ListItem component={Link} to="/" button>
+					<ListItem
+						component={Link}
+						to="/"
+						button
+						onClick={handleClose}
+					>
 						<ListItemText
 							primary={
 								<Typography color="error">Beenden</Typography>

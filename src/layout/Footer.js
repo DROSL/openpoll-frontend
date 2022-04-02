@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 
 const links = [
 	{
-		name: "Impresseum",
+		name: "Impressum",
 		url: "/impressum",
 	},
 	{
@@ -21,8 +21,9 @@ const links = [
 function Footer() {
 	return (
 		<Toolbar>
-			{links.map((link) => (
+			{links.map((link, index) => (
 				<Button
+					key={`footer-${index}`}
 					component={Link}
 					to={link.url}
 					variant="text"

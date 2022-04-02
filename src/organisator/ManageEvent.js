@@ -28,11 +28,13 @@ import CloseIcon from "@mui/icons-material/Close";
 import EditEventDialog from "./EditEventDialog";
 import ShareEventDialog from "./ShareEventDialog";
 import CreatePollDialog from "./CreatePollDialog";
-import ListPolls from "./ListPollsO";
-import CreatePollFiller from "./CreatePollFiller";
+import ListPolls from "./ListPolls";
+import CreatePollFiller from "../filler/CreatePollFiller";
 import DeleteEventDialog from "./DeleteEventDialog";
+import NotFound from "../NotFound";
 
-function ManageEvent() {
+function ManageEvent(props) {
+	const { socket } = props;
 	const { eventId } = useParams();
 
 	const theme = useTheme();
@@ -54,6 +56,8 @@ function ManageEvent() {
 	const [openShareDiaglog, toggleShareEventDialog] = useState(false);
 	const [openNewPollDialog, toggleNewPollDialog] = useState(false);
 
+	const [errorEventNotFound, setErrorEventNotFound] = useState(false);
+
 	const [openSnackbar, toggleSnackbar] = useState(false);
 	const [snackbarText, setSnackbarText] = useState("");
 
@@ -72,6 +76,7 @@ function ManageEvent() {
 			})
 			.catch((err) => {
 				console.log(err);
+				setErrorEventNotFound(true);
 			});
 	};
 
@@ -96,17 +101,21 @@ function ManageEvent() {
 	const editEvent = (title, description, file, deleteFile) => {
 		fetch(`/events/${eventId}`, {
 			method: "PUT",
-			headers: { "Content-Type": "application/json" },
+			headers: {
+				"Content-Type": "application/json",
+			},
 			body: JSON.stringify({
 				title: title,
 				description: description,
 			}),
 		})
 			.then((res) => {
-				if (res.ok) {
+				if (!res.ok) {
 					setTitle(title);
 					setDescription(description);
 					toggleEditEventDialog(false);
+				} else {
+					throw "Could not edit event";
 				}
 			})
 			.catch((err) => {
@@ -115,7 +124,40 @@ function ManageEvent() {
 	};
 
 	const deleteEvent = () => {
-		return;
+		fetch(`/events/${eventId}`, {
+			method: "DELETE",
+		})
+			.then((res) => {
+				if (res.ok) {
+					setRedirect("/");
+				} else {
+					throw "Could not delete event";
+				}
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	};
+
+	const changeJoinable = (newJoinable) => {
+		fetch(`/events/${eventId}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				open: newJoinable,
+			}),
+		})
+			.then((res) => {
+				console.log(res);
+				if (res.ok) {
+					setJoinable(newJoinable);
+				}
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	};
 
 	const createPoll = (
@@ -208,6 +250,10 @@ function ManageEvent() {
 		return <Navigate to={redirect} />;
 	}
 
+	if (errorEventNotFound) {
+		return <NotFound />;
+	}
+
 	return (
 		<React.Fragment>
 			<EditEventDialog
@@ -239,6 +285,8 @@ function ManageEvent() {
 				}}
 				code={eventId}
 				secret={secret}
+				joinable={joinable}
+				handleChangeJoinable={changeJoinable}
 			/>
 
 			<CreatePollDialog
