@@ -2,8 +2,8 @@
 
 **Our Simple Open Poll (OSOP)** is an open source web application for conducting polls and surveys with a special focus on data minimization and user privacy. It does not collect personal data, does not set tracking cookies, and does not outsource the service to third-party solutions, but runs entirely on your own server.
 
-- [osop-api](https://github.com/DROSL/openpoll-api)
-- [osop-frontend](https://github.com/DROSL/openpoll-api)
+-   [osop-api](https://github.com/DROSL/openpoll-api)
+-   [osop-frontend](https://github.com/DROSL/openpoll-api)
 
 ## Install
 

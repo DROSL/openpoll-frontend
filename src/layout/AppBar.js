@@ -23,7 +23,7 @@ function AppBar(props) {
 					</IconButton>
 				) : null}
 				<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-					OpenPoll
+					OSOP
 				</Typography>
 			</Toolbar>
 		</MuiAppBar>

@@ -45,7 +45,7 @@ function Home() {
 					if (res.ok) {
 						setRedirect(`/p/event/${code}`);
 					} else {
-						throw "Not ok";
+						throw new Error("Not ok");
 					}
 				})
 				.catch((err) => {

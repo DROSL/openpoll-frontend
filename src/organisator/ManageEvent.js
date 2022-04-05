@@ -115,7 +115,7 @@ function ManageEvent(props) {
 					setDescription(description);
 					toggleEditEventDialog(false);
 				} else {
-					throw "Could not edit event";
+					throw new Error("Could not edit event");
 				}
 			})
 			.catch((err) => {
@@ -131,7 +131,7 @@ function ManageEvent(props) {
 				if (res.ok) {
 					setRedirect("/");
 				} else {
-					throw "Could not delete event";
+					throw new Error("Could not delete event");
 				}
 			})
 			.catch((err) => {
@@ -235,6 +235,8 @@ function ManageEvent(props) {
 			.then((res) => {
 				if (res.ok) {
 					setPolls(polls.filter((poll) => poll._id !== pollId));
+				} else {
+					throw new Error("Could not delete poll");
 				}
 			})
 			.catch((err) => {
@@ -244,6 +246,30 @@ function ManageEvent(props) {
 
 	const showResults = (pollId) => {
 		setRedirect(`/o/event/${eventId}/poll/${pollId}/results`);
+	};
+
+	const deleteResults = (pollId) => {
+		fetch(`/polls/${pollId}/results`, {
+			method: "DELETE",
+		})
+			.then((res) => {
+				if (res.ok) {
+					setPolls(
+						polls.map((poll) => ({
+							...poll,
+							...(poll._id === pollId && {
+								started: false,
+								stopped: false,
+							}),
+						}))
+					);
+				} else {
+					throw new Error("Could not delete results");
+				}
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	};
 
 	if (redirect) {
@@ -297,7 +323,11 @@ function ManageEvent(props) {
 
 			<Box p={3}>
 				<Stack spacing={2}>
-					<Typography variant="h4" component="h1">
+					<Typography
+						variant="h4"
+						component="h1"
+						sx={{ wordWrap: "break-word" }}
+					>
 						{title}
 					</Typography>
 
@@ -363,6 +393,7 @@ function ManageEvent(props) {
 								stopPoll={stopPoll}
 								deletePoll={deletePoll}
 								showResults={showResults}
+								deleteResults={deleteResults}
 							/>
 						</React.Fragment>
 					) : (

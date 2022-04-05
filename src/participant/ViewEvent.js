@@ -153,7 +153,11 @@ function ViewEvent(props) {
 			<Box p={3}>
 				<Stack spacing={2}>
 					<Box>
-						<Typography variant="h4" component="h1">
+						<Typography
+							variant="h4"
+							component="h1"
+							sx={{ wordWrap: "break-word" }}
+						>
 							{title}
 						</Typography>
 						<Typography>{description}</Typography>

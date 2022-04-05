@@ -25,7 +25,7 @@ import Vote from "./participant/Vote";
 import ResultsOrganisator from "./organisator/Results";
 import ResultsParticipant from "./participant/Results";
 
-import Impressum from "./sites/Impressum";
+import Nutzungsbedingungen from "./sites/Nutzungsbedingungen";
 
 import NotFound from "./NotFound";
 
@@ -131,8 +131,8 @@ function App() {
 								/>
 								<Route
 									exact
-									path="/impressum"
-									element={<Impressum />}
+									path="/nutzungsbedingungen"
+									element={<Nutzungsbedingungen />}
 								/>
 								<Route exact path="/" element={<Home />} />
 								<Route exact path="*" element={<NotFound />} />

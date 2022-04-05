@@ -44,7 +44,7 @@ function ListPolls(props) {
 						>
 							<ListItemText
 								primary={poll.title}
-								secondary="4 Antwortmöglichkeiten"
+								secondary="Mehrere Antwortmöglichkeiten"
 							/>
 							{desktop && (
 								<Button
@@ -83,7 +83,7 @@ function ListPolls(props) {
 						>
 							<ListItemText
 								primary={poll.title}
-								secondary="4 Antwortmöglichkeiten"
+								secondary="Mehrere Antwortmöglichkeiten"
 							/>
 							{desktop && (
 								<Button

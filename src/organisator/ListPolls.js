@@ -87,7 +87,7 @@ function ListPolls(props) {
 						<ListItem key={`poll-active-${index}`}>
 							<ListItemText
 								primary={poll.title}
-								secondary="4 Antwortmöglichkeiten"
+								secondary="Mehrere Antwortmöglichkeiten"
 							/>
 							<Stack direction="row" spacing={1}>
 								{desktop && (
@@ -165,7 +165,7 @@ function ListPolls(props) {
 						<ListItem key={`poll-saved-${index}`}>
 							<ListItemText
 								primary={poll.title}
-								secondary="4 Antwortmöglichkeiten"
+								secondary="Mehrere Antwortmöglichkeiten"
 							/>
 							<Stack direction="row" spacing={1}>
 								{desktop && activePolls.length === 0 && (
@@ -242,7 +242,7 @@ function ListPolls(props) {
 						<ListItem key={`poll-finished-${index}`}>
 							<ListItemText
 								primary={poll.title}
-								secondary="4 Antwortmöglichkeiten"
+								secondary="Mehrere Antwortmöglichkeiten"
 							/>
 							<IconButton onClick={createClickHandler3(poll._id)}>
 								<MoreVertIcon />

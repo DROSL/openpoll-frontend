@@ -164,7 +164,7 @@ function Results(props) {
 		}));
 
 	const words = results
-		.filter((result) => !result.hidden)
+		.filter((result) => !result.hidden && result.votes > 0)
 		.map((result, index) => ({
 			text: result.title,
 			value: result.votes,
@@ -270,6 +270,7 @@ function Results(props) {
 									fontSizes: [40, 120],
 									padding: 30,
 									fontFamily: "Roboto",
+									transitionDuration: 0,
 								}}
 								callbacks={{
 									getWordColor: (word) => word.color,

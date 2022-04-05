@@ -19,7 +19,7 @@ function Join(props) {
 				if (res.ok) {
 					setRedirect(`/p/event/${eventId}`);
 				} else {
-					throw "Failed to join";
+					throw new Error("Failed to join");
 				}
 			})
 			.catch((err) => {

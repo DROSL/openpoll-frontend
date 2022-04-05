@@ -1,37 +1,38 @@
 import { Link } from "react-router-dom";
 
+import MuiLink from "@mui/material/Link";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
-
-const links = [
-	{
-		name: "Impressum",
-		url: "/impressum",
-	},
-	{
-		name: "Datenschutzerklärung",
-		url: "/datenschutzerklaerung",
-	},
-	{
-		name: "Nutzungsbedingungen",
-		url: "/nutzungsbedingungen",
-	},
-];
 
 function Footer() {
 	return (
 		<Toolbar>
-			{links.map((link, index) => (
-				<Button
-					key={`footer-${index}`}
-					component={Link}
-					to={link.url}
-					variant="text"
-					color="inherit"
-				>
-					{link.name}
-				</Button>
-			))}
+			<Button
+				component={MuiLink}
+				href="https://www.ovgu.de/Impressum.html"
+				target="_blank"
+				variant="text"
+				color="inherit"
+			>
+				Impressum
+			</Button>
+			<Button
+				component={MuiLink}
+				href="https://www.ovgu.de/datenschutzerklaerung.html"
+				target="_blank"
+				variant="text"
+				color="inherit"
+			>
+				Datenschutzerklärung
+			</Button>
+			<Button
+				component={Link}
+				to="/nutzungsbedingungen"
+				variant="text"
+				color="inherit"
+			>
+				Nutzungsbedingungen
+			</Button>
 		</Toolbar>
 	);
 }
