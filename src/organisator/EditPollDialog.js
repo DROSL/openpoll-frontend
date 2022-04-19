@@ -38,7 +38,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 function CreatePollDialog(props) {
-	const { open, handleClose, handleCreate } = props;
+	const { open, handleClose, handleSave, poll } = props;
 
 	const theme = useTheme();
 	const desktop = useMediaQuery(theme.breakpoints.up("md"));
@@ -51,14 +51,15 @@ function CreatePollDialog(props) {
 		useState(false);
 
 	useEffect(() => {
-		setTitle("");
+		console.log(poll && poll.title);
+		setTitle(poll && poll.title || "");
 		setAnswers([""]);
 		setAllowCustomAnswers(false);
 		setVotesPerParticipant(1);
 	}, [open]);
 
 	const createCreateHandler = () => {
-		handleCreate(
+		handleSave(
 			title,
 			answers,
 			allowCustomAnswers,

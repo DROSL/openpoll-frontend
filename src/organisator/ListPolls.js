@@ -39,35 +39,35 @@ function ListPolls(props) {
 	const theme = useTheme();
 	const desktop = useMediaQuery(theme.breakpoints.up("md"));
 
-	const [selectedPoll, setSelectedPoll] = useState(null);
+	const [selectedPollId, setSelectedPollId] = useState(null);
 
 	const [anchorEl1, setAnchorEl1] = useState(null);
 	const [anchorEl2, setAnchorEl2] = useState(null);
 	const [anchorEl3, setAnchorEl3] = useState(null);
 
 	const createClickHandler1 = (pollId) => (event) => {
-		setSelectedPoll(pollId);
+		setSelectedPollId(pollId);
 		setAnchorEl1(event.currentTarget);
 		setAnchorEl2(null);
 		setAnchorEl3(null);
 	};
 
 	const createClickHandler2 = (pollId) => (event) => {
-		setSelectedPoll(pollId);
+		setSelectedPollId(pollId);
 		setAnchorEl1(null);
 		setAnchorEl2(event.currentTarget);
 		setAnchorEl3(null);
 	};
 
 	const createClickHandler3 = (pollId) => (event) => {
-		setSelectedPoll(pollId);
+		setSelectedPollId(pollId);
 		setAnchorEl1(null);
 		setAnchorEl2(null);
 		setAnchorEl3(event.currentTarget);
 	};
 
 	const handleClose = () => {
-		setSelectedPoll(null);
+		setSelectedPollId(null);
 		setAnchorEl1(null);
 		setAnchorEl2(null);
 		setAnchorEl3(null);
@@ -128,7 +128,7 @@ function ListPolls(props) {
 				<MenuItem disabled>Starten</MenuItem>
 				<MenuItem
 					onClick={() => {
-						stopPoll(selectedPoll);
+						stopPoll(selectedPollId);
 						handleClose();
 					}}
 				>
@@ -136,7 +136,7 @@ function ListPolls(props) {
 				</MenuItem>
 				<MenuItem
 					onClick={() => {
-						showResults(selectedPoll);
+						showResults(selectedPollId);
 						handleClose();
 					}}
 				>
@@ -145,7 +145,7 @@ function ListPolls(props) {
 				<Divider sx={{ width: 200 }} />
 				<MenuItem
 					onClick={() => {
-						deletePoll(selectedPoll);
+						deletePoll(selectedPollId);
 						handleClose();
 					}}
 				>
@@ -203,7 +203,7 @@ function ListPolls(props) {
 			>
 				<MenuItem
 					onClick={() => {
-						startPoll(selectedPoll);
+						startPoll(selectedPollId);
 						handleClose();
 					}}
 					disabled={activePolls.length > 0}
@@ -213,7 +213,7 @@ function ListPolls(props) {
 				<MenuItem disabled>Stoppen</MenuItem>
 				<MenuItem
 					onClick={() => {
-						editPoll(selectedPoll);
+						editPoll(selectedPollId);
 						handleClose();
 					}}
 				>
@@ -222,7 +222,7 @@ function ListPolls(props) {
 				<Divider sx={{ width: 200 }} />
 				<MenuItem
 					onClick={() => {
-						deletePoll(selectedPoll);
+						deletePoll(selectedPollId);
 						handleClose();
 					}}
 				>
@@ -266,7 +266,7 @@ function ListPolls(props) {
 			>
 				<MenuItem
 					onClick={() => {
-						showResults(selectedPoll);
+						showResults(selectedPollId);
 						handleClose();
 					}}
 				>
@@ -274,7 +274,7 @@ function ListPolls(props) {
 				</MenuItem>
 				<MenuItem
 					onClick={() => {
-						deleteResults(selectedPoll);
+						deleteResults(selectedPollId);
 						handleClose();
 					}}
 				>
@@ -283,7 +283,7 @@ function ListPolls(props) {
 				<Divider />
 				<MenuItem
 					onClick={() => {
-						deletePoll(selectedPoll);
+						deletePoll(selectedPollId);
 						handleClose();
 					}}
 				>

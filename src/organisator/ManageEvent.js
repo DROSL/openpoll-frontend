@@ -9,9 +9,6 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 
-import Snackbar from "@mui/material/Snackbar";
-import IconButton from "@mui/material/IconButton";
-
 import Skeleton from "@mui/material/Skeleton";
 
 import List from "@mui/material/List";
@@ -23,11 +20,11 @@ import AddIcon from "@mui/icons-material/Add";
 import SettingsIcon from "@mui/icons-material/Settings";
 import GroupIcon from "@mui/icons-material/Group";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import CloseIcon from "@mui/icons-material/Close";
 
 import EditEventDialog from "./EditEventDialog";
 import ShareEventDialog from "./ShareEventDialog";
-import CreatePollDialog from "./CreatePollDialog";
+import CreatePollDialog from "./EditPollDialog";
+import EditPollDialog from "./EditPollDialog";
 import ListPolls from "./ListPolls";
 import CreatePollFiller from "../filler/CreatePollFiller";
 import DeleteEventDialog from "./DeleteEventDialog";
@@ -51,15 +48,15 @@ function ManageEvent(props) {
 
 	const [polls, setPolls] = useState([]);
 
+	const [pollToBeEdited, setPollToBeEdited] = useState(null);
+
 	const [openEditEventDialog, toggleEditEventDialog] = useState(false);
 	const [openDeleteEventDialog, toggleDeleteEventDialog] = useState(false);
 	const [openShareDiaglog, toggleShareEventDialog] = useState(false);
 	const [openNewPollDialog, toggleNewPollDialog] = useState(false);
+	const [openEditPollDialog, toggleEditPollDialog] = useState(false);
 
 	const [errorEventNotFound, setErrorEventNotFound] = useState(false);
-
-	const [openSnackbar, toggleSnackbar] = useState(false);
-	const [snackbarText, setSnackbarText] = useState("");
 
 	const getEvent = () => {
 		fetch(`/events/${eventId}`, {
@@ -105,8 +102,8 @@ function ManageEvent(props) {
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({
-				title: title,
-				description: description,
+				title,
+				description,
 			}),
 		})
 			.then((res) => {
@@ -189,6 +186,21 @@ function ManageEvent(props) {
 				console.log(err);
 			});
 	};
+
+	const handleClickEditPoll = (pollId) => {
+		setPollToBeEdited(polls.filter(p => p._id === pollId));
+		toggleEditPollDialog(true);
+	}
+
+	const editPoll = (
+		title,
+		answers,
+		allowCustomAnswers,
+		votesPerParticipant,
+		allowMultipleVotesPerAnswer
+	) => {
+		return;
+	}
 
 	const startPoll = (pollId) => {
 		fetch(`/polls/${pollId}/start`, {
@@ -318,7 +330,14 @@ function ManageEvent(props) {
 			<CreatePollDialog
 				open={openNewPollDialog}
 				handleClose={() => toggleNewPollDialog(false)}
-				handleCreate={createPoll}
+				handleSave={createPoll}
+			/>
+
+			<EditPollDialog
+				open={openEditPollDialog}
+				handleClose={() => toggleEditPollDialog(false)}
+				handleSave={editPoll}
+				poll={pollToBeEdited}
 			/>
 
 			<Box p={3}>
@@ -389,6 +408,7 @@ function ManageEvent(props) {
 							<ListPolls
 								polls={polls}
 								eventId={eventId}
+								editPoll={handleClickEditPoll}
 								startPoll={startPoll}
 								stopPoll={stopPoll}
 								deletePoll={deletePoll}
@@ -403,27 +423,6 @@ function ManageEvent(props) {
 					)}
 				</Stack>
 			</Box>
-
-			<Snackbar
-				open={openSnackbar}
-				autoHideDuration={3000}
-				anchorOrigin={{
-					vertical: "bottom",
-					horizontal: "center",
-				}}
-				onClose={() => toggleSnackbar(false)}
-				message={snackbarText}
-				action={
-					<IconButton
-						size="small"
-						aria-label="close"
-						color="inherit"
-						onClick={() => toggleSnackbar(false)}
-					>
-						<CloseIcon fontSize="small" />
-					</IconButton>
-				}
-			/>
 		</React.Fragment>
 	);
 }
