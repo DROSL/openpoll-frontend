@@ -51,11 +51,19 @@ function CreatePollDialog(props) {
 		useState(false);
 
 	useEffect(() => {
-		console.log(poll && poll.title);
-		setTitle(poll && poll.title || "");
-		setAnswers([""]);
-		setAllowCustomAnswers(false);
-		setVotesPerParticipant(1);
+		if (poll) {
+			setTitle(poll.title);
+			setAnswers([...poll.answers.map((answer) => answer.title), ""]);
+			setAllowCustomAnswers(poll.allowCustomAnswers);
+			setVotesPerParticipant(poll.votesPerParticipant);
+			setAllowMultipleVotesPerAnswer(poll.allowMultipleVotesPerAnswer);
+		} else {
+			setTitle("");
+			setAnswers([""]);
+			setAllowCustomAnswers(false);
+			setVotesPerParticipant(1);
+			setAllowMultipleVotesPerAnswer(false);
+		}
 	}, [open]);
 
 	const createCreateHandler = () => {

@@ -188,9 +188,19 @@ function ManageEvent(props) {
 	};
 
 	const handleClickEditPoll = (pollId) => {
-		setPollToBeEdited(polls.filter(p => p._id === pollId));
-		toggleEditPollDialog(true);
-	}
+		fetch(`/polls/${pollId}`, {
+			method: "GET",
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				console.log(data);
+				setPollToBeEdited(data);
+				toggleEditPollDialog(true);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	};
 
 	const editPoll = (
 		title,
@@ -199,8 +209,33 @@ function ManageEvent(props) {
 		votesPerParticipant,
 		allowMultipleVotesPerAnswer
 	) => {
-		return;
-	}
+		const pollId = pollToBeEdited._id;
+
+		fetch(`/polls/${pollId}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				title,
+				answers,
+				allowCustomAnswers,
+				votesPerParticipant,
+				allowMultipleVotesPerAnswer,
+			}),
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				setPollToBeEdited(null);
+				toggleEditPollDialog(false);
+				setPolls(
+					polls.map((poll) => (poll.pollId === pollId ? data : poll))
+				);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	};
 
 	const startPoll = (pollId) => {
 		fetch(`/polls/${pollId}/start`, {
