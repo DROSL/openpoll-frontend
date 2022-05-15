@@ -41,6 +41,9 @@ function ShareEventDialog(props) {
 	const { open, handleClose, code, secret, joinable, handleChangeJoinable } =
 		props;
 
+	const codeLink = `${window.location.origin}/c/${code}`;
+	const secretLink = `${window.location.origin}/s/${secret}`;
+
 	const theme = useTheme();
 	const desktop = useMediaQuery(theme.breakpoints.up("md"));
 
@@ -49,6 +52,17 @@ function ShareEventDialog(props) {
 
 	const handleTabChange = (event, newValue) => {
 		setTab(newValue);
+	};
+
+	const createCopyHandler = (link) => () => {
+		navigator.clipboard.writeText(link).then(
+			function () {
+				// success
+			},
+			function () {
+				// error
+			}
+		);
 	};
 
 	return (
@@ -118,17 +132,18 @@ function ShareEventDialog(props) {
 									<OutlinedInput
 										readOnly
 										autoFocus
-										value={
-											showLink
-												? `${window.location.origin}/c/${code}`
-												: code
-										}
+										value={showLink ? codeLink : code}
 										onFocus={(e) => {
 											e.target.select();
 										}}
 										endAdornment={
 											<InputAdornment position="end">
-												<IconButton edge="end">
+												<IconButton
+													edge="end"
+													onClick={createCopyHandler(
+														codeLink
+													)}
+												>
 													<ContentCopyIcon />
 												</IconButton>
 											</InputAdornment>
@@ -167,10 +182,15 @@ function ShareEventDialog(props) {
 								onFocus={(e) => {
 									e.target.select();
 								}}
-								value={`${window.location.origin}/s/${secret}`}
+								value={secretLink}
 								endAdornment={
 									<InputAdornment position="end">
-										<IconButton edge="end">
+										<IconButton
+											edge="end"
+											onClick={createCopyHandler(
+												secretLink
+											)}
+										>
 											<ContentCopyIcon />
 										</IconButton>
 									</InputAdornment>
