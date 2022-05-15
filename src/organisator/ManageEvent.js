@@ -108,12 +108,11 @@ function ManageEvent(props) {
 		})
 			.then((res) => {
 				if (!res.ok) {
-					setTitle(title);
-					setDescription(description);
-					toggleEditEventDialog(false);
-				} else {
 					throw new Error("Could not edit event");
 				}
+				setTitle(title);
+				setDescription(description);
+				toggleEditEventDialog(false);
 			})
 			.catch((err) => {
 				console.log(err);
