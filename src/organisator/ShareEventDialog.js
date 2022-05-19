@@ -141,7 +141,9 @@ function ShareEventDialog(props) {
 												<IconButton
 													edge="end"
 													onClick={createCopyHandler(
-														codeLink
+														showLink
+															? codeLink
+															: code
 													)}
 												>
 													<ContentCopyIcon />

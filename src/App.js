@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import { ThemeProvider, useTheme } from "@mui/material/styles";
@@ -30,13 +30,49 @@ import Nutzungsbedingungen from "./sites/Nutzungsbedingungen";
 import NotFound from "./NotFound";
 
 import { io } from "socket.io-client";
-const socket = io();
 
 function App() {
+	const [socket, setSocket] = useState(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(false);
 	const [open, toggleDrawer] = useState(false);
 
 	const theme = useTheme();
 	const desktop = useMediaQuery(theme.breakpoints.up("md"));
+
+	useEffect(() => {
+		fetch("/welcome")
+			.then((res) => {
+				if (res.ok) {
+					console.log("API Success");
+
+					const sock = io();
+					sock.on("connect", () => {
+						setSocket(sock);
+						setLoading(false);
+						console.log("Socket Success");
+					});
+
+					sock.on("disconnect", () => {
+						setError(true);
+						console.log("Socket Error");
+					});
+				} else {
+					throw new Error("Could not connect to API");
+				}
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	}, []);
+
+	if (error) {
+		return <div>Error!</div>;
+	}
+
+	if (loading) {
+		return <div>Loading...</div>;
+	}
 
 	return (
 		<ThemeProvider theme={mytheme}>
