@@ -8,6 +8,8 @@ import Typography from "@mui/material/Typography";
 
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 
@@ -22,21 +24,11 @@ import PercentIcon from "@mui/icons-material/Percent";
 import Icon from "@mdi/react";
 import { mdiNumeric } from "@mdi/js";
 
-import {
-	BarChart,
-	Bar,
-	PieChart,
-	Pie,
-	XAxis,
-	YAxis,
-	CartesianGrid,
-} from "recharts";
-import WordCloud from "react-wordcloud";
+import BarChart from "./ResultsBarChart";
+import WordCloud from "./ResultsWordCloud";
+import ResultsList from "./ResultsList";
 
 import { useTheme } from "@mui/material/styles";
-import { grey, blue } from "@mui/material/colors";
-
-const ANSWER_COLORS = ["#32a852", "#4287f5", "#fcba03", "#db4437"];
 
 const CHARTS = [
 	{
@@ -46,6 +38,7 @@ const CHARTS = [
 	{
 		id: "pie",
 		name: "Kreisdiagramm",
+		disabled: true,
 	},
 	{
 		id: "word",
@@ -70,7 +63,7 @@ function Results(props) {
 	});
 	const [results, setResults] = useState([]);
 
-	const [chart, setChart] = useState("bar");
+	const [chart, setChart] = useState("list");
 	const [format, setFormat] = useState("numeric");
 	const [type, setType] = useState("percentage");
 
@@ -144,7 +137,7 @@ function Results(props) {
 				if (res.ok) {
 					setPoll({ ...poll, stopped: true });
 				} else {
-					throw "Could not stop poll";
+					throw new Error("Could not stop poll");
 				}
 			})
 			.catch((err) => {
@@ -155,21 +148,6 @@ function Results(props) {
 	if (redirect) {
 		return <Navigate to={redirect} />;
 	}
-
-	const bars = results
-		.filter((result) => !result.hidden)
-		.map((result) => ({
-			name: result.title,
-			value: result.votes,
-		}));
-
-	const words = results
-		.filter((result) => !result.hidden && result.votes > 0)
-		.map((result, index) => ({
-			text: result.title,
-			value: result.votes,
-			color: ANSWER_COLORS[index % ANSWER_COLORS.length],
-		}));
 
 	const totalVotes = results.reduce(
 		(counter, result) => counter + result.votes,
@@ -185,7 +163,10 @@ function Results(props) {
 				elevation={2}
 			>
 				{CHARTS.map((CHART) => (
-					<MenuItem onClick={createChangeChartHandler(CHART.id)}>
+					<MenuItem
+						onClick={createChangeChartHandler(CHART.id)}
+						disabled={Boolean(CHART.disabled)}
+					>
 						{chart === CHART.id && (
 							<ListItemIcon>
 								<CheckIcon />
@@ -225,59 +206,9 @@ function Results(props) {
 						justifyContent: "center",
 					}}
 				>
-					{chart === "bar" && (
-						<BarChart width={700} height={400} data={bars}>
-							<XAxis
-								dataKey="name"
-								dy={10}
-								axisLine={false}
-								tickLine={false}
-							/>
-							<YAxis axisLine={false} tickLine={false} />
-							<CartesianGrid
-								stroke={grey[300]}
-								vertical={false}
-							/>
-							<Bar
-								isAnimationActive={true}
-								type="monotone"
-								dataKey="value"
-								fill={blue[500]}
-								maxBarSize={50}
-							/>
-						</BarChart>
-					)}
-					{chart === "pie" && (
-						<PieChart width={700} height={400}>
-							<Pie
-								data={bars}
-								cx="50%"
-								cy="50%"
-								innerRadius={100}
-								outerRadius={200}
-								fill={blue[500]}
-							/>
-						</PieChart>
-					)}
-					{chart === "word" && (
-						<Box>
-							<WordCloud
-								words={words}
-								minSize={[400, 400]}
-								options={{
-									deterministic: true,
-									rotations: 0,
-									fontSizes: [40, 120],
-									padding: 30,
-									fontFamily: "Roboto",
-									transitionDuration: 0,
-								}}
-								callbacks={{
-									getWordColor: (word) => word.color,
-								}}
-							/>
-						</Box>
-					)}
+					{chart === "bar" && <BarChart data={results} />}
+					{chart === "word" && <WordCloud data={results} />}
+					{chart === "list" && <ResultsList data={results} />}
 				</Box>
 
 				<Stack
