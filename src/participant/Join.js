@@ -12,7 +12,7 @@ function Join(props) {
 	const { eventId } = useParams();
 
 	useEffect(() => {
-		fetch(`/events/${eventId}/join`, {
+		fetch(`/api/events/${eventId}/join`, {
 			method: "POST",
 		})
 			.then((res) => {

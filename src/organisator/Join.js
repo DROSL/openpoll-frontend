@@ -12,7 +12,7 @@ function Join(props) {
 	const { secret } = useParams();
 
 	useEffect(() => {
-		fetch(`/events/${secret}/edit`, {
+		fetch(`/api/events/${secret}/edit`, {
 			method: "POST",
 		})
 			.then((res) => res.json())

@@ -41,7 +41,7 @@ function App() {
 	const desktop = useMediaQuery(theme.breakpoints.up("md"));
 
 	useEffect(() => {
-		fetch("/welcome")
+		fetch("/api/welcome")
 			.then((res) => {
 				if (res.ok) {
 					console.log("API Success");

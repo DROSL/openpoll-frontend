@@ -1,5 +1,5 @@
 {
-	"name": "openpoll-frontend",
+	"name": "osop-frontend",
 	"version": "0.1.0",
 	"private": true,
 	"proxy": "http://localhost:4000",
@@ -21,9 +21,8 @@
 		"react-dom": "^17.0.2",
 		"react-router-dom": "^6.3.0",
 		"react-scripts": "4.0.3",
-		"react-wordcloud": "^1.2.7",
 		"recharts": "^2.1.9",
-		"socket.io-client": "^4.4.0",
+		"socket.io-client": "^4.5.3",
 		"web-vitals": "^1.1.2"
 	},
 	"scripts": {

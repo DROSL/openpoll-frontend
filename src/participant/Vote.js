@@ -59,7 +59,7 @@ function Vote(props) {
 	}, [open]);
 
 	const getPoll = () => {
-		fetch(`/polls/${pollId}`, {
+		fetch(`/api/polls/${pollId}`, {
 			method: "GET",
 		})
 			.then((res) => res.json())
@@ -78,7 +78,7 @@ function Vote(props) {
 	};
 
 	const getAnswers = () => {
-		fetch(`/polls/${pollId}/answers`, {
+		fetch(`/api/polls/${pollId}/answers`, {
 			method: "GET",
 		})
 			.then((res) => res.json())
@@ -91,7 +91,7 @@ function Vote(props) {
 	};
 
 	const getVotes = () => {
-		fetch(`/polls/${pollId}/votes`, {
+		fetch(`/api/polls/${pollId}/votes`, {
 			method: "GET",
 		})
 			.then((res) => res.json())
@@ -120,7 +120,7 @@ function Vote(props) {
 
 	const handleVote = (answerId) => {
 		setProcessing(true);
-		fetch(`/answers/${answerId}/vote`, {
+		fetch(`/api/answers/${answerId}/vote`, {
 			method: "POST",
 		})
 			.then((res) => res.json())
@@ -134,7 +134,7 @@ function Vote(props) {
 	};
 
 	const createAnswer = () => {
-		fetch(`/polls/${pollId}/answers`, {
+		fetch(`/api/polls/${pollId}/answers`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

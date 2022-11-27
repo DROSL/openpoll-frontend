@@ -82,10 +82,7 @@ function ResultsP(props) {
 		const requestOptions = {
 			method: "GET",
 		};
-		fetch(
-			process.env.REACT_APP_API_URL + `/polls/${params.pollId}/votes`,
-			requestOptions
-		)
+		fetch(`/api/polls/${params.pollId}/votes`, requestOptions)
 			.then((response) => response.json())
 			.then((data) => {
 				setResults(data);
@@ -109,10 +106,7 @@ function ResultsP(props) {
 		const requestOptions = {
 			method: "GET",
 		};
-		fetch(
-			process.env.REACT_APP_API_URL + `/polls/${params.pollId}`,
-			requestOptions
-		)
+		fetch(`/api/polls/${params.pollId}`, requestOptions)
 			.then((response) => response.json())
 			.then((data) => {
 				setQuestion(data.title);

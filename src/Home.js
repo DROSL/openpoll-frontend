@@ -34,7 +34,7 @@ function Home() {
 		if (code) {
 			setLoading(true);
 
-			fetch(`/events/${code}/join`, {
+			fetch(`/api/events/${code}/join`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -59,7 +59,7 @@ function Home() {
 	const handleClickCreate = () => {
 		setLoading(true);
 
-		fetch("/events", {
+		fetch("/api/events", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

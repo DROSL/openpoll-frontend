@@ -25,7 +25,7 @@ import Icon from "@mdi/react";
 import { mdiNumeric } from "@mdi/js";
 
 import BarChart from "./ResultsBarChart";
-import WordCloud from "./ResultsWordCloud";
+//import WordCloud from "./ResultsWordCloud";
 import ResultsList from "./ResultsList";
 
 import { useTheme } from "@mui/material/styles";
@@ -91,7 +91,7 @@ function Results(props) {
 	};
 
 	const getPoll = () => {
-		fetch(`/polls/${pollId}`, {
+		fetch(`/api/polls/${pollId}`, {
 			method: "GET",
 		})
 			.then((res) => res.json())
@@ -104,7 +104,7 @@ function Results(props) {
 	};
 
 	const getResults = () => {
-		fetch(`/polls/${pollId}/results`, {
+		fetch(`/api/polls/${pollId}/results`, {
 			method: "GET",
 		})
 			.then((res) => res.json())
@@ -130,7 +130,7 @@ function Results(props) {
 	}, []);
 
 	const stopPoll = () => {
-		fetch(`/polls/${pollId}/stop`, {
+		fetch(`/api/polls/${pollId}/stop`, {
 			method: "PUT",
 		})
 			.then((res) => {
@@ -207,7 +207,7 @@ function Results(props) {
 					}}
 				>
 					{chart === "bar" && <BarChart data={results} />}
-					{chart === "word" && <WordCloud data={results} />}
+					{/*chart === "word" && <WordCloud data={results} />*/}
 					{chart === "list" && <ResultsList data={results} />}
 				</Box>
 

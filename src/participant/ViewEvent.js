@@ -33,7 +33,7 @@ function ViewEvent(props) {
 	const [errorEventNotFound, setErrorEventNotFound] = useState(false);
 
 	const getEvent = () => {
-		fetch(`/events/${eventId}`, {
+		fetch(`/api/events/${eventId}`, {
 			method: "GET",
 		})
 			.then((res) => res.json())
@@ -49,7 +49,7 @@ function ViewEvent(props) {
 	};
 
 	const getPolls = () => {
-		fetch(`/events/${eventId}/polls`, {
+		fetch(`/api/events/${eventId}/polls`, {
 			method: "GET",
 		})
 			.then((res) => res.json())

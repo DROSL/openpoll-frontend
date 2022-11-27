@@ -59,7 +59,7 @@ function ManageEvent(props) {
 	const [errorEventNotFound, setErrorEventNotFound] = useState(false);
 
 	const getEvent = () => {
-		fetch(`/events/${eventId}`, {
+		fetch(`/api/events/${eventId}`, {
 			method: "GET",
 		})
 			.then((res) => res.json())
@@ -78,7 +78,7 @@ function ManageEvent(props) {
 	};
 
 	const getPolls = () => {
-		fetch(`/events/${eventId}/polls`, {
+		fetch(`/api/events/${eventId}/polls`, {
 			method: "GET",
 		})
 			.then((res) => res.json())
@@ -96,7 +96,7 @@ function ManageEvent(props) {
 	}, []);
 
 	const editEvent = (title, description, file, deleteFile) => {
-		fetch(`/events/${eventId}`, {
+		fetch(`/api/events/${eventId}`, {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json",
@@ -120,7 +120,7 @@ function ManageEvent(props) {
 	};
 
 	const deleteEvent = () => {
-		fetch(`/events/${eventId}`, {
+		fetch(`/api/events/${eventId}`, {
 			method: "DELETE",
 		})
 			.then((res) => {
@@ -136,7 +136,7 @@ function ManageEvent(props) {
 	};
 
 	const changeJoinable = (newJoinable) => {
-		fetch(`/events/${eventId}`, {
+		fetch(`/api/events/${eventId}`, {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json",
@@ -163,7 +163,7 @@ function ManageEvent(props) {
 		votesPerParticipant,
 		allowMultipleVotesPerAnswer
 	) => {
-		fetch(`/events/${eventId}/polls`, {
+		fetch(`/api/events/${eventId}/polls`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -187,7 +187,7 @@ function ManageEvent(props) {
 	};
 
 	const handleClickEditPoll = (pollId) => {
-		fetch(`/polls/${pollId}`, {
+		fetch(`/api/polls/${pollId}`, {
 			method: "GET",
 		})
 			.then((res) => res.json())
@@ -210,7 +210,7 @@ function ManageEvent(props) {
 	) => {
 		const pollId = pollToBeEdited._id;
 
-		fetch(`/polls/${pollId}`, {
+		fetch(`/api/polls/${pollId}`, {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json",
@@ -237,7 +237,7 @@ function ManageEvent(props) {
 	};
 
 	const startPoll = (pollId) => {
-		fetch(`/polls/${pollId}/start`, {
+		fetch(`/api/polls/${pollId}/start`, {
 			method: "PUT",
 		})
 			.then((res) => {
@@ -256,7 +256,7 @@ function ManageEvent(props) {
 	};
 
 	const stopPoll = (pollId) => {
-		fetch(`/polls/${pollId}/stop`, {
+		fetch(`/api/polls/${pollId}/stop`, {
 			method: "PUT",
 		})
 			.then((res) => {
@@ -275,7 +275,7 @@ function ManageEvent(props) {
 	};
 
 	const deletePoll = (pollId) => {
-		fetch(`/polls/${pollId}`, {
+		fetch(`/api/polls/${pollId}`, {
 			method: "DELETE",
 		})
 			.then((res) => {
@@ -295,7 +295,7 @@ function ManageEvent(props) {
 	};
 
 	const deleteResults = (pollId) => {
-		fetch(`/polls/${pollId}/results`, {
+		fetch(`/api/polls/${pollId}/results`, {
 			method: "DELETE",
 		})
 			.then((res) => {

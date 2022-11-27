@@ -28,7 +28,10 @@ function ResultsList(props) {
 							}}
 						/>
 					</ListItemIcon>
-					<ListItemText primary={answer.title} secondary="Antwortmöglichkeit" />
+					<ListItemText
+						primary={answer.title}
+						secondary="Antwortmöglichkeit"
+					/>
 					{answer.votes}
 				</ListItem>
 			))}
