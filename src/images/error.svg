@@ -1,0 +1,26 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="512"
+    height="512"
+    enableBackground="new 0 0 512 512"
+    viewBox="0 0 512 512"
+>
+    <ellipse
+    cx="256"
+    cy="256"
+    fill="#e04f5f"
+    data-original="#e04f5f"
+    rx="256"
+    ry="255.832"
+    ></ellipse>
+    <g fill="#fff" transform="rotate(134.999 32.003 32.001)">
+    <path
+        d="M3.98 -427.615H59.971999999999994V-141.94299999999998H3.98z"
+        data-original="#ffffff"
+    ></path>
+    <path
+        d="M-110.828 -312.815H174.84400000000002V-256.823H-110.828z"
+        data-original="#ffffff"
+    ></path>
+    </g>
+</svg>

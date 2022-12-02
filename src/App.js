@@ -27,6 +27,8 @@ import ResultsParticipant from "./participant/Results";
 
 import Nutzungsbedingungen from "./sites/Nutzungsbedingungen";
 
+import Loading from "./Loading";
+import APIError from "./APIError";
 import NotFound from "./NotFound";
 
 import { io } from "socket.io-client";
@@ -62,17 +64,11 @@ function App() {
 				}
 			})
 			.catch((err) => {
+				setLoading(false);
+				setError(true);
 				console.log(err);
 			});
 	}, []);
-
-	if (error) {
-		return <div>Error!</div>;
-	}
-
-	if (loading) {
-		return <div>Loading...</div>;
-	}
 
 	return (
 		<ThemeProvider theme={mytheme}>
@@ -121,65 +117,81 @@ function App() {
 								scrollbarWidth: "thin",
 							}}
 						>
-							<Routes>
-								<Route
-									exact
-									path="/o/event/:eventId"
-									element={<ManageEvent socket={socket} />}
-								/>
-								<Route
-									exact
-									path="/p/event/:eventId"
-									element={<ViewEvent socket={socket} />}
-								/>
-								<Route
-									exact
-									path="/p/event/:eventId/poll/:pollId"
-									element={<Vote socket={socket} />}
-								/>
-								<Route
-									exact
-									path="/o/event/:eventId/poll/:pollId/results"
-									element={
-										<ResultsOrganisator socket={socket} />
-									}
-								/>
-								<Route
-									exact
-									path="/p/event/:eventId/poll/:pollId/results"
-									element={
-										<ResultsParticipant socket={socket} />
-									}
-								/>
-								<Route
-									exact
-									path="/c/:eventId"
-									element={
-										<JoinParticipant socket={socket} />
-									}
-								/>
-								<Route
-									exact
-									path="/s/:secret"
-									element={
-										<JoinOrganisator socket={socket} />
-									}
-								/>
-								<Route
-									exact
-									path="/nutzungsbedingungen"
-									element={<Nutzungsbedingungen />}
-								/>
-								<Route exact path="/" element={<Home />} />
-								<Route exact path="*" element={<NotFound />} />
-							</Routes>
+							{error ? (
+								<APIError />
+							) : loading ? (
+								<Loading />
+							) : (
+								<Routes>
+									<Route
+										exact
+										path="/o/event/:eventId"
+										element={
+											<ManageEvent socket={socket} />
+										}
+									/>
+									<Route
+										exact
+										path="/p/event/:eventId"
+										element={<ViewEvent socket={socket} />}
+									/>
+									<Route
+										exact
+										path="/p/event/:eventId/poll/:pollId"
+										element={<Vote socket={socket} />}
+									/>
+									<Route
+										exact
+										path="/o/event/:eventId/poll/:pollId/results"
+										element={
+											<ResultsOrganisator
+												socket={socket}
+											/>
+										}
+									/>
+									<Route
+										exact
+										path="/p/event/:eventId/poll/:pollId/results"
+										element={
+											<ResultsParticipant
+												socket={socket}
+											/>
+										}
+									/>
+									<Route
+										exact
+										path="/c/:eventId"
+										element={
+											<JoinParticipant socket={socket} />
+										}
+									/>
+									<Route
+										exact
+										path="/s/:secret"
+										element={
+											<JoinOrganisator socket={socket} />
+										}
+									/>
+									<Route
+										exact
+										path="/nutzungsbedingungen"
+										element={<Nutzungsbedingungen />}
+									/>
+									<Route exact path="/" element={<Home />} />
+									<Route
+										exact
+										path="*"
+										element={<NotFound />}
+									/>
+								</Routes>
+							)}
 						</Box>
-						{desktop ? (
+						{desktop && (
 							<React.Fragment>
 								<Divider />
 								<Footer />
 							</React.Fragment>
-						) : null}
+						)}
 					</Box>
 				</Box>
 			</Router>

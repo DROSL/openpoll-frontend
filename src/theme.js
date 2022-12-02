@@ -4,7 +4,7 @@ import { deDE } from "@mui/material/locale";
 const theme = createTheme(
 	{
 		/*palette: {
-			primary: { main: "#32a852" },
+			primary: { main: "#cddc39" },
 		},*/
 	},
 	deDE

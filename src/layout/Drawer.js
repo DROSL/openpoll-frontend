@@ -21,7 +21,7 @@ function Drawer(props) {
 				<List>
 					<ListItem>
 						<ListItemText
-							primary={"OpenPoll"}
+							primary={"OSOP"}
 							secondary={"Version 1.0"}
 						/>
 					</ListItem>

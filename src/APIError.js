@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom";
-
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -7,7 +5,7 @@ import Button from "@mui/material/Button";
 
 import image from "./images/error.svg";
 
-function NotFound() {
+function APIError() {
 	return (
 		<Box
 			sx={{
@@ -21,28 +19,29 @@ function NotFound() {
 			}}
 		>
 			<Stack direction="column" alignItems="center">
-				<img src={image} alt="Seite nicht gefunden" width="100px" />
+				<img src={image} alt="Backend nicht erreichbar" width="100px" />
 				<Typography variant="h6" sx={{ mt: 3 }}>
-					Seite nicht gefunden
+					Backend nicht erreichbar
 				</Typography>
 				<Typography align="center" sx={{ mt: 1 }}>
-					Das hat nicht geklappt. Die angeforderte Seite existiert
-					nicht.
+					Der Backend-Server konnte nicht erreicht werden. Versuchen
+					Sie es später noch einmal!
 				</Typography>
 				<Button
-					LinkComponent={Link}
-					to="/"
 					size="large"
 					variant="contained"
 					color="primary"
 					disableElevation
 					sx={{ mt: 3 }}
+					onClick={() => {
+						window.location.reload();
+					}}
 				>
-					Zur Startseite
+					Neu laden
 				</Button>
 			</Stack>
 		</Box>
 	);
 }
 
-export default NotFound;
+export default APIError;
